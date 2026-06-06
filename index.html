@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Кунка: Виноградный Шторм</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+  button{outline:none !important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+    -webkit-tap-highlight-color:rgba(0,0,0,0) !important;-webkit-appearance:none;appearance:none;}
+  button:focus,button:focus-visible{outline:none !important;}
+  html,body{height:100%;width:100%;overflow:hidden;}
+  body{background:#160d06;
+    font-family:"Cinzel",Georgia,serif;color:#f0d9a8;
+    touch-action:none;user-select:none;-webkit-user-select:none;
+    text-rendering:geometricPrecision;}
+
+  /* пиратская палитра: состаренное дерево, матовая латунь */
+  :root{
+    --gold:#d4a843;       /* состаренное золото (приглушённее) */
+    --gold2:#9c6f28;      /* тёмная латунь */
+    --gold-deep:#5e4313;  /* тень золота */
+    --wood1:#33200f;      /* светлая доска */
+    --wood2:#1f1208;      /* тёмная доска */
+    --wood-deep:#130a03;  /* самый тёмный */
+    --rope:#b8945a;       /* канат */
+    --parch:#e3cd9c;      /* пергамент/текст */
+  }
+
+  /* текстура дерева — грубые доски с выраженными стыками */
+  .wood-bg{
+    background:
+      repeating-linear-gradient(90deg,
+        rgba(0,0,0,.55) 0px, rgba(0,0,0,.55) 3px,
+        rgba(0,0,0,.12) 3px, rgba(0,0,0,.12) 5px,
+        transparent 5px, transparent 92px,
+        rgba(0,0,0,.55) 92px, rgba(0,0,0,.55) 95px),
+      repeating-linear-gradient(0deg,
+        rgba(0,0,0,.16) 0px, rgba(0,0,0,.16) 2px,
+        transparent 2px, transparent 6px),
+      linear-gradient(180deg,#33200f,#1f1208 60%,#160c04);
+  }
+
+  .vignette{position:fixed;inset:0;pointer-events:none;z-index:90;
+    background:radial-gradient(ellipse at center, transparent 62%, rgba(0,0,0,0.30) 100%);}
+
+  /* плавное появление экранов — мягко для глаз */
+  @keyframes screenIn{ from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:translateY(0);} }
+  #howto,#hold,#settings,#over{ animation:screenIn .5s cubic-bezier(.25,.6,.3,1) both; }
+  #menu{ transition:opacity .6s ease; }
+  /* пульс счёта при начислении */
+  @keyframes scorePulse{ 0%{transform:scale(1);} 35%{transform:scale(1.18);color:#fff2c8;} 100%{transform:scale(1);} }
+  .score.pulse #sc{ display:inline-block; animation:scorePulse .28s ease; }
+  .scan{display:none;} /* убрано: пиратский стиль без скан-линий */
+
+  /* ---- канат-разделитель (SVG, чёткие линии) ---- */
+  .rope{width:80%;max-width:320px;margin:22px auto;display:block;
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));}
+
+  #menu{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;padding:30px 22px;
+    transition:opacity 1s ease;}
+  #menu::before{content:"";position:absolute;inset:0;z-index:-1;
+    background:radial-gradient(circle at 50% 32%, rgba(212,168,67,.06), transparent 62%);}
+
+  /* заголовок — золотая гравировка по дереву, строгая */
+  .title{font-family:"Cinzel Decorative",serif;font-weight:900;
+    font-size:clamp(44px,15vw,104px);line-height:.9;letter-spacing:2px;
+    text-transform:uppercase;text-align:center;
+    color:var(--gold);
+    text-shadow:
+      0 2px 0 #3a2710,
+      0 3px 0 #2a1c0a,
+      0 4px 4px rgba(0,0,0,.7);}
+  .title .l2{display:block;font-size:.34em;letter-spacing:3px;margin-top:10px;white-space:nowrap;
+    color:var(--gold2);
+    text-shadow:0 1px 0 #3a2710,0 2px 3px rgba(0,0,0,.6);}
+  .sub{font-size:13px;color:#d8bd86;letter-spacing:1px;margin:2px 0 4px;text-align:center;padding:0 18px;
+    line-height:1.6;font-weight:600;}
+  #menuBest{font-family:"Cinzel",serif;font-size:14px;color:var(--gold);letter-spacing:1px;
+    margin:18px 0 8px;min-height:18px;font-weight:700;
+    text-shadow:0 1px 2px #000;}
+
+  /* кнопка — матовая латунная табличка, строгая, чёткая тёмная рамка */
+  .btn{font-family:"Cinzel",serif;font-weight:700;letter-spacing:3px;font-size:16px;text-transform:uppercase;
+    color:#1f1206;
+    background:linear-gradient(180deg,#c79b42 0%,#a87f30 50%,#80591f 100%);
+    border:2px solid #4a3410;padding:15px 46px;cursor:pointer;margin-top:16px;border-radius:0;
+    box-shadow:
+      0 3px 0 #2e2009,
+      0 5px 8px rgba(0,0,0,.55),
+      inset 0 1px 0 rgba(240,210,150,.35);
+    text-shadow:0 1px 0 rgba(230,200,140,.4);
+    transition:transform .07s,box-shadow .07s,filter .15s;}
+  .btn:hover{filter:brightness(1.08);}
+  .btn:active{transform:translateY(3px);
+    box-shadow:0 1px 0 #2e2009,0 2px 4px rgba(0,0,0,.5),inset 0 1px 0 rgba(240,210,150,.25);}
+  .blink{animation:glow 2.2s ease-in-out infinite;}
+  @keyframes glow{
+    0%,100%{filter:brightness(1);}
+    50%{filter:brightness(1.08);}
+  }
+  /* второстепенная кнопка — без латуни, тёмная с тонкой золотой рамкой */
+  .btn-ghost{font-family:"Cinzel",serif;font-weight:600;letter-spacing:2px;font-size:13px;text-transform:uppercase;
+    color:var(--gold);background:rgba(25,14,6,.55);
+    border:1.5px solid var(--gold2);padding:10px 26px;cursor:pointer;margin-top:14px;border-radius:0;
+    box-shadow:0 2px 0 #2e2009;
+    transition:transform .07s,background .15s,border-color .15s;}
+  .btn-ghost:hover{background:rgba(45,28,14,.7);border-color:var(--gold);}
+  .btn-ghost:active{transform:translateY(2px);box-shadow:0 0 0 #2e2009;background:rgba(45,28,14,.7);}
+  .menu-grid{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px;
+    width:100%;max-width:300px;justify-content:center;}
+  .menu-grid .btn-ghost{margin-top:0;flex:0 0 calc(50% - 5px);box-sizing:border-box;
+    padding:11px 4px;font-size:12px;letter-spacing:1px;}
+
+  /* ---- панель настроек ---- */
+  #settings{position:fixed;inset:0;z-index:45;display:none;overflow:hidden;}
+  #settingsContent{position:relative;z-index:2;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;width:100%;height:100%;padding:30px 22px;}
+  .set-title{font-family:"Cinzel Decorative",serif;font-weight:900;font-size:30px;color:var(--gold);
+    letter-spacing:2px;text-transform:uppercase;text-shadow:0 2px 0 #3a2710,0 3px 5px rgba(0,0,0,.7);margin-bottom:6px;}
+  .rope-mini{width:200px;height:4px;margin:10px auto 26px;
+    background:repeating-linear-gradient(60deg,#6e4e1d 0,#bf9a5e 3px,#6e4e1d 6px);border-radius:2px;
+    box-shadow:0 1px 2px rgba(0,0,0,.6);}
+  .set-row{display:flex;align-items:center;justify-content:space-between;
+    width:100%;max-width:280px;margin:9px 0;
+    background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);padding:11px 16px;}
+  .set-label{font-family:"Cinzel",serif;font-weight:600;font-size:16px;color:var(--parch);letter-spacing:1px;}
+  .toggle{font-family:"Cinzel",serif;font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;
+    padding:7px 16px;border:2px solid #4a3410;color:#1f1206;min-width:62px;
+    background:linear-gradient(180deg,#c79b42,#80591f);}
+  .toggle.off{background:rgba(40,25,12,.8);color:#8a6c3c;border-color:#3a2710;}
+  .diff-row{display:flex;gap:8px;width:100%;max-width:300px;justify-content:center;}
+  #menuDiff{margin:14px auto 4px;max-width:260px;}
+  .diff{flex:1;font-family:"Cinzel",serif;font-weight:600;font-size:13px;cursor:pointer;
+    padding:11px 4px;border:1.5px solid var(--gold2);color:var(--gold);background:rgba(25,14,6,.55);
+    text-transform:uppercase;letter-spacing:.5px;}
+  .diff.sel{background:linear-gradient(180deg,#c79b42,#80591f);color:#1f1206;border-color:#4a3410;font-weight:700;}
+
+  /* подпись автора */
+  .credit{margin-top:22px;font-family:"Cinzel",serif;font-size:11px;letter-spacing:1px;
+    color:#8a6c3c;opacity:.75;}
+
+  /* экран «Как играть» */
+  #howto{position:fixed;inset:0;z-index:46;display:none;overflow:hidden;}
+  #howtoContent{position:relative;z-index:2;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;width:100%;height:100%;padding:30px 22px;}
+  .how-row{display:flex;align-items:flex-start;gap:12px;width:100%;max-width:330px;margin:8px 0;
+    background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);padding:12px 14px;}
+  .how-ic{font-size:20px;line-height:1.2;flex:none;}
+  .how-tx{font-family:"Cinzel",serif;font-size:14px;color:var(--parch);line-height:1.45;letter-spacing:.3px;}
+  .how-tx b{color:var(--gold);}
+  .how-pt{color:var(--gold);font-weight:700;}
+  .dot{display:inline-block;width:16px;height:16px;border-radius:50%;flex:none;
+    box-shadow:inset 0 -2px 3px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.4);}
+
+  /* каюта капитана */
+  #hold{position:fixed;inset:0;z-index:46;display:none;overflow:hidden;}
+  #holdContent{position:relative;z-index:2;display:flex;flex-direction:column;
+    align-items:center;width:100%;height:100%;padding:24px 22px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  #rankBox{width:100%;max-width:320px;text-align:center;margin-bottom:8px;}
+  #rankName{font-family:"Cinzel Decorative",serif;font-weight:900;font-size:30px;color:var(--gold);
+    letter-spacing:1px;text-shadow:0 2px 0 #3a2710,0 3px 5px rgba(0,0,0,.6);}
+  #rankBarWrap{height:14px;background:rgba(15,8,3,.7);border:1.5px solid var(--gold2);
+    margin:12px 0 6px;overflow:hidden;}
+  #rankBar{height:100%;width:0%;background:linear-gradient(180deg,#e8c061,#9c6f28);
+    transition:width .6s ease;}
+  #rankNext{font-family:"Cinzel",serif;font-size:12px;color:#cdae74;letter-spacing:1px;}
+  .hold-sub{font-family:"Cinzel",serif;font-size:13px;letter-spacing:3px;color:var(--gold);
+    text-transform:uppercase;margin:20px 0 12px;font-weight:700;}
+  #trophyGrid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:330px;}
+  .trophy{flex:0 0 calc(33.33% - 7px);box-sizing:border-box;aspect-ratio:1/1;
+    border:1.5px solid var(--gold2);background:rgba(15,8,3,.5);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px;
+    text-align:center;position:relative;}
+  .trophy.locked{opacity:.45;filter:grayscale(1);}
+  .trophy .tmedal{width:34px;height:34px;}
+  .trophy .tname{font-family:"Cinzel",serif;font-size:9.5px;line-height:1.2;color:var(--parch);letter-spacing:.3px;}
+  .trophy.unlocked .tname{color:var(--gold);}
+
+
+  #pauseOverlay{position:absolute;inset:0;z-index:55;display:none;cursor:pointer;
+    align-items:center;justify-content:center;background:rgba(20,11,4,.82);}
+  #pauseOverlay>div{display:flex;flex-direction:column;align-items:center;
+    font-family:"Cinzel Decorative",serif;
+    font-size:36px;font-weight:900;letter-spacing:6px;color:var(--gold);
+    text-transform:uppercase;text-shadow:0 2px 0 #4a3110,0 3px 6px rgba(0,0,0,.7);}
+  #pauseOverlay>div span{font-family:"Cinzel",serif;font-size:12px;letter-spacing:2px;color:#cdae74;margin-top:18px;
+    text-shadow:none;font-weight:600;}
+  #game{position:fixed;inset:0;z-index:30;display:none;background:#000;opacity:1;transition:opacity .5s ease;}
+  #game.fadein{opacity:0;}
+  #cv{display:block;width:100%;height:100%;}
+
+  /* HUD — латунные таблички */
+  .hud{position:fixed;top:0;left:0;right:0;z-index:50;padding:12px 14px;
+    display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;}
+  .hud .plate{background:linear-gradient(180deg,rgba(45,28,14,.92),rgba(25,14,6,.92));
+    border:1.5px solid var(--gold2);border-radius:0;padding:7px 12px;
+    box-shadow:0 2px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(232,192,97,.2);}
+  .hud .plate.score-plate{flex:none;}
+  .hud .plate.lives{flex:none;text-align:right;}
+  .hud .score{font-family:"Cinzel",serif;font-size:18px;font-weight:700;color:var(--gold);letter-spacing:1px;
+    text-shadow:0 1px 2px #000;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .hud .score #sc{display:inline-block;min-width:2.4em;text-align:left;font-variant-numeric:tabular-nums;}
+  .hud .lvl{font-size:10px;color:#cdae74;letter-spacing:2px;margin-top:3px;text-transform:uppercase;font-weight:600;}
+  .hud .lives{font-family:"Cinzel",serif;font-size:19px;color:var(--gold);font-weight:700;text-shadow:0 1px 2px #000;
+    font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .hud .lives #gcount{display:inline-block;min-width:0.7em;text-align:center;}
+  /* кнопка паузы — жёстко по центру, не зависит от ширины соседних табличек */
+  #pause{position:absolute;left:50%;top:12px;transform:translateX(-50%);
+    pointer-events:auto;font-family:"Cinzel",serif;font-weight:700;
+    display:flex;align-items:center;justify-content:center;min-width:34px;
+    background:linear-gradient(180deg,#c79b42,#80591f);border:2px solid #4a3410;color:#1f1206;border-radius:0;
+    padding:7px 14px;font-size:15px;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;
+    -webkit-appearance:none;appearance:none;touch-action:manipulation;
+    isolation:isolate;
+    box-shadow:0 3px 0 #5e3f12,inset 0 1px 1px rgba(255,255,255,.5);}
+  /* все состояния выглядят одинаково — никаких системных вспышек */
+  #pause:active,#pause:focus,#pause:focus-visible,#pause:focus-within,#pause:hover{
+    outline:none !important;border-color:#4a3410 !important;
+    background:linear-gradient(180deg,#c79b42,#80591f) !important;color:#1f1206 !important;
+    box-shadow:0 3px 0 #5e3f12,inset 0 1px 1px rgba(255,255,255,.5) !important;
+    transform:translateX(-50%) !important;}
+
+  /* ---- экран проигрыша: пергамент в деревянной раме ---- */
+  #over{position:fixed;inset:0;z-index:60;display:none;overflow:hidden;}
+  #over::before{content:"";position:absolute;inset:0;background:rgba(15,8,3,.92);}
+  #overContent{position:relative;z-index:2;display:flex;flex-direction:column;
+    align-items:center;width:100%;height:100%;
+    padding:22px 16px 30px;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-gutter:stable both-edges;}
+  #overContent::-webkit-scrollbar{width:0;background:transparent;}
+  #over h2{font-family:"Cinzel Decorative",serif;font-size:26px;color:var(--gold);margin-bottom:10px;letter-spacing:1px;text-align:center;
+    text-transform:uppercase;text-shadow:0 2px 0 #4a3110,0 3px 6px rgba(0,0,0,.7);padding:0 16px;font-weight:900;}
+  #over .fin{font-family:"Cinzel",serif;font-size:18px;color:var(--parch);margin-bottom:12px;letter-spacing:1px;font-weight:600;text-shadow:0 1px 2px #000;}
+  #overbest{font-size:13px;color:#cdae74;letter-spacing:1px;margin-bottom:16px;font-weight:600;}
+  #overbest.isnew{color:var(--gold);font-weight:700;animation:cpop .3s ease;text-shadow:0 0 10px rgba(232,192,97,.6);}
+  @keyframes cpop{from{transform:scale(1.5);}to{transform:scale(1);}}
+
+  #submitBox{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:8px;}
+  #pname{font-family:"Cinzel",serif;font-weight:700;text-transform:uppercase;letter-spacing:2px;
+    text-align:center;font-size:15px;color:#2a1a08;
+    background:linear-gradient(180deg,#f0d9a8,#d8bd86);
+    border:2px solid var(--gold2);padding:11px 16px;width:210px;outline:none;border-radius:0;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.3);}
+  #pname::placeholder{color:#8a6c3c;}
+  #submitBox .btn{margin-top:0;font-size:14px;padding:11px 26px;}
+
+  /* таблица рекордов — деревянная доска с золотой рамкой */
+  #board{margin:14px 0 18px;width:100%;max-width:350px;
+    background:linear-gradient(180deg,rgba(45,28,14,.6),rgba(25,14,6,.6));
+    border:2px solid var(--gold2);border-radius:0;padding:12px 8px;
+    box-shadow:0 4px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(232,192,97,.15);}
+  #board .bt{font-family:"Cinzel Decorative",serif;font-size:14px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;
+    text-align:center;margin-bottom:10px;font-weight:700;text-shadow:0 1px 2px #000;}
+  #board .br{display:flex;justify-content:space-between;gap:16px;padding:6px 14px;
+    font-family:"Cinzel",serif;font-size:15px;color:var(--parch);letter-spacing:.5px;font-weight:600;
+    border-bottom:1px solid rgba(183,132,47,.3);}
+  #board .br:last-child{border-bottom:none;}
+  #board .br .rk{color:var(--gold2);width:26px;text-align:left;font-weight:700;}
+  #board .br .nm{flex:1;text-align:left;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  #board .br .sc{font-weight:700;text-align:right;color:var(--gold);}
+  #board .br.me{background:rgba(232,192,97,.12);}
+  #board .br.me .rk,#board .br.me .nm{color:var(--gold);}
+  #board .bload{text-align:center;color:#a8884e;font-size:13px;padding:8px;letter-spacing:1px;font-weight:600;}
+
+  /* блокировка горизонтальной ориентации */
+  #rotateLock{position:fixed;inset:0;z-index:200;display:none;
+    background:linear-gradient(180deg,#33200f,#160c04);
+    color:var(--gold);font-family:"Cinzel",serif;text-align:center;
+    align-items:center;justify-content:center;flex-direction:column;padding:30px;letter-spacing:1px;}
+  #rotateLock .ic{font-size:40px;margin-bottom:18px;animation:rotateHint 2s ease-in-out infinite;}
+  @keyframes rotateHint{0%,100%{transform:rotate(0);}50%{transform:rotate(-90deg);}}
+  @media (orientation:landscape) and (max-height:520px){
+    #rotateLock{display:flex;}
+  }
+
+  /* уведомление о трофее */
+  #trophyToast{position:fixed;top:16px;left:50%;z-index:120;
+    display:flex;align-items:center;gap:11px;
+    background:linear-gradient(180deg,rgba(45,28,14,.97),rgba(25,14,6,.97));
+    border:1.5px solid var(--gold2);padding:10px 18px;
+    box-shadow:0 4px 16px rgba(0,0,0,.6);
+    transform:translateX(-50%) translateY(-140px);
+    transition:transform .5s cubic-bezier(.2,.8,.3,1);
+    will-change:transform;}
+  #trophyToast.show{transform:translateX(-50%) translateY(0);}
+  #trophyToast .tt-medal{width:34px;height:34px;flex:none;}
+  #trophyToast .tt-title{font-family:"Cinzel",serif;font-size:10px;letter-spacing:2px;color:#cdae74;text-transform:uppercase;}
+  #trophyToast .tt-name{font-family:"Cinzel",serif;font-size:15px;font-weight:700;color:var(--gold);}
+</style>
+</head>
+<body>
+  <div id="rotateLock">
+    <div class="ic">⟳</div>
+    <div>Поверни телефон<br>вертикально</div>
+  </div>
+  <div id="trophyToast">
+    <svg class="tt-medal" viewBox="0 0 40 40"><circle cx="20" cy="16" r="11" fill="#e8c061" stroke="#9c6f28" stroke-width="2"/><path d="M14 25 L11 38 L20 33 L29 38 L26 25 Z" fill="#e8c061" stroke="#9c6f28" stroke-width="1.5"/></svg>
+    <div class="tt-txt"><div class="tt-title">Трофей получен!</div><div class="tt-name"></div></div>
+  </div>
+  <div id="menu" class="wood-bg">
+    <div class="title">Кунка<span class="l2">Виноградный Шторм</span></div>
+    <svg class="rope" viewBox="0 0 320 26" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="rg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#edd49a"/>
+          <stop offset="0.45" stop-color="#bf9a5e"/>
+          <stop offset="1" stop-color="#6e4e1d"/>
+        </linearGradient>
+      </defs>
+      <rect x="16" y="5" width="288" height="16" rx="8" fill="url(#rg)" stroke="#4a3410" stroke-width="1.2"/>
+      <g stroke="#4a3410" stroke-width="1.8" stroke-linecap="round" opacity="0.78">
+        <path d="M22 5 L34 21 M38 5 L50 21 M54 5 L66 21 M70 5 L82 21 M86 5 L98 21 M102 5 L114 21 M118 5 L130 21 M134 5 L146 21 M150 5 L162 21 M166 5 L178 21 M182 5 L194 21 M198 5 L210 21 M214 5 L226 21 M230 5 L242 21 M246 5 L258 21 M262 5 L274 21 M278 5 L290 21 M294 5 L302 21"/>
+      </g>
+      <rect x="16" y="6.5" width="288" height="2.5" rx="1.2" fill="#f6e0ac" opacity="0.55"/>
+      <ellipse cx="13" cy="13" rx="13" ry="12" fill="url(#rg)" stroke="#4a3410" stroke-width="1.2"/>
+      <ellipse cx="307" cy="13" rx="13" ry="12" fill="url(#rg)" stroke="#4a3410" stroke-width="1.2"/>
+    </svg>
+    <div class="sub">Фиолетовый — в рот. Зелёный — дави.</div>
+    <div class="diff-row" id="menuDiff">
+      <button class="diff sel" data-diff="normal">Обычная</button>
+      <button class="diff" data-diff="hard">Хардкор</button>
+    </div>
+    <div id="menuBest"></div>
+    <button class="btn blink" id="play">Играть</button>
+    <div class="menu-grid">
+      <button class="btn-ghost" id="showHow">Как играть</button>
+      <button class="btn-ghost" id="showHold">Каюта</button>
+      <button class="btn-ghost" id="showLb">Рекорды</button>
+      <button class="btn-ghost" id="showSettings">Настройки</button>
+    </div>
+  </div>
+
+  <div id="howto" class="wood-bg">
+    <div id="howtoContent">
+      <h2 class="set-title">Как играть</h2>
+      <div class="rope-mini"></div>
+      <div class="how-row"><span class="dot" style="background:#c77bf0;"></span>
+        <span class="how-tx"><b>Фиолетовый</b> — тащи Кунке в рот. <span class="how-pt">+10</span></span></div>
+      <div class="how-row"><span class="dot" style="background:#ffd24a;"></span>
+        <span class="how-tx"><b>Золотой</b> — редкий, тащи в рот, быстро исчезает. <span class="how-pt">+50</span></span></div>
+      <div class="how-row"><span class="dot" style="background:#7ec23a;"></span>
+        <span class="how-tx"><b>Зелёный</b> — кислый! Дави нажатиями. Накопишь 4 — Кунка задохнётся.</span></div>
+      <div class="how-row"><span class="how-ic"><svg width="15" height="21" viewBox="0 0 16 22" style="vertical-align:middle;"><rect x="6" y="1" width="4" height="4" fill="#c9a567"/><rect x="5.5" y="4.5" width="5" height="2.5" fill="#b8945a"/><rect x="3" y="7" width="10" height="14" rx="2.5" fill="#a85f25"/><rect x="4.5" y="10" width="2" height="9" rx="1" fill="#d8a04a" opacity="0.5"/></svg></span>
+        <span class="how-tx"><b>Ром</b> — тащи в рот, чтобы смыть все зелёные разом.</span></div>
+      <button class="btn" id="howBack" style="margin-top:24px;">Назад</button>
+    </div>
+  </div>
+
+  <div id="hold" class="wood-bg">
+    <div id="holdContent">
+      <h2 class="set-title">Каюта капитана</h2>
+      <div class="rope-mini"></div>
+      <div id="rankBox">
+        <div id="rankName">Салага</div>
+        <div id="rankBarWrap"><div id="rankBar"></div></div>
+        <div id="rankNext">до звания Юнга: 40</div>
+      </div>
+      <div class="hold-sub">Трофеи</div>
+      <div id="trophyGrid"></div>
+      <button class="btn" id="holdBack" style="margin-top:20px;">Назад</button>
+    </div>
+  </div>
+
+  <div id="settings" class="wood-bg">
+    <div id="settingsContent">
+      <h2 class="set-title">Настройки</h2>
+      <div class="rope-mini"></div>
+
+      <div class="set-row">
+        <span class="set-label">Музыка</span>
+        <button class="toggle on" id="tgMusic" data-on="1">ВКЛ</button>
+      </div>
+
+      <button class="btn" id="settingsBack" style="margin-top:26px;">Назад</button>
+      <div class="credit">Создано Admiral8Dota</div>
+    </div>
+  </div>
+
+  <div id="game">
+    <canvas id="cv"></canvas>
+    <div class="hud">
+      <div class="plate score-plate">
+        <div class="score">Очки: <span id="sc">0</span></div>
+        <div class="lvl">Уровень <span id="lv">1</span></div>
+      </div>
+      <div id="pause" aria-label="Пауза">II</div>
+      <div class="plate lives" id="lives" style="font-size:19px;text-align:right;color:#8fd14a;"><span id="gcount">0</span>/4</div>
+    </div>
+    <div id="pauseOverlay"><div>ПАУЗА<span>нажми, чтобы продолжить</span></div></div>
+  </div>
+
+  <div id="over" class="wood-bg">
+    <div id="overContent">
+      <h2 id="overtitle">Кунка задохнулся!</h2>
+      <div class="fin">Очки: <span id="finsc">0</span></div>
+      <div id="overbest">Твой рекорд: 0</div>
+
+      <div id="submitBox">
+        <input id="pname" maxlength="12" placeholder="ТВОЁ ИМЯ" autocomplete="off">
+        <button class="btn" id="submitScore">Записать рекорд</button>
+      </div>
+
+      <div id="board">
+        <div class="bt" id="boardTitle">Таблица рекордов</div>
+        <div id="boardRows"><div class="bload">загрузка…</div></div>
+      </div>
+
+      <button class="btn" id="again">Ещё раз</button>
+      <button class="btn" id="tomenu" style="margin-top:10px;">В меню</button>
+    </div>
+  </div>
+
+  <div class="vignette"></div>
+  <audio id="bgm" src="music.mp3" loop></audio>
+
+<script>
+(function(){
+  // попытка заблокировать ориентацию в портрет (срабатывает в установленном PWA/полноэкранном режиме)
+  try{ if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('portrait').catch(function(){}); }catch(e){}
+  var menu=document.getElementById('menu'),game=document.getElementById('game'),
+      over=document.getElementById('over'),bgm=document.getElementById('bgm'),
+      cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+
+  var kunkaImg=new Image();kunkaImg.src='kunka.png';
+  var kunkaOpenImg=new Image();kunkaOpenImg.src='kunka_open.png';
+  var purpleImg=new Image();purpleImg.src='grapes.png';
+  var greenImg=new Image();greenImg.src='grapes_green.png';
+  var goldImg=new Image();goldImg.src='grapes_gold.png';
+  var chokeImg=new Image();chokeImg.src='kunka_choke.png';
+  var rumImg=new Image();rumImg.src='rum.png';
+  var seaBg=new Image(); seaBg._ok=false;
+  seaBg.onload=function(){ seaBg._ok=true; };
+  seaBg.onerror=function(){ seaBg._ok=false; };
+  seaBg.src='sea_bg.png';
+
+  var W,H;
+  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+  window.addEventListener('resize',resize);resize();
+
+  // ---- онлайн-таблица рекордов (Supabase) ----
+  var SB_URL='https://fjhqekpgeiucfszmaylv.supabase.co';
+  var SB_KEY='sb_publishable_5G8k1X2brW7fMvhaX4aIVw_WiEWGLgA';
+  var SB_HEADERS={
+    'apikey':SB_KEY,
+    'Authorization':'Bearer '+SB_KEY,
+    'Content-Type':'application/json'
+  };
+  var lastSubmitted=false; // не дать записать один результат дважды
+
+  function lbClean(s){ return String(s).replace(/[^a-zA-Zа-яА-Я0-9 _-]/g,'').trim().slice(0,12); }
+
+  var HC_MARK='~'; // метка хардкора (1 символ, недопустим в пользовательских именах -> не отнимает место и надёжно фильтруется)
+  function lbSubmit(name,score,cb){
+    // имя уже очищено и обрезано до 12 в lbClean; метка добавляется сверх
+    var stored = (difficulty==='hard') ? (HC_MARK+name) : name;
+    fetch(SB_URL+'/rest/v1/scores',{
+      method:'POST',
+      headers:SB_HEADERS,
+      body:JSON.stringify({name:stored,score:score})
+    }).then(function(r){ cb&&cb(r.ok); })
+      .catch(function(){ cb&&cb(false); });
+  }
+  function lbLoad(cb){
+    var done=false;
+    var finish=function(v){ if(done)return; done=true; cb(v); };
+    // страховка: если сеть висит — через 8с показываем ошибку, а не вечную загрузку
+    setTimeout(function(){ finish(null); }, 8000);
+    var url=SB_URL+'/rest/v1/scores?select=name,score&order=score.desc&limit=200';
+    fetch(url,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!Array.isArray(d)){ finish([]); return; }
+        var hard=(difficulty==='hard');
+        var out=[];
+        for(var i=0;i<d.length;i++){
+          var nm=String(d[i].name||'');
+          // хардкор-метки: новая "~" и старая "HC_" (legacy)
+          var isHC=false, clean=nm;
+          if(nm.indexOf(HC_MARK)===0){ isHC=true; clean=nm.slice(HC_MARK.length); }
+          else if(nm.indexOf('HC_')===0){ isHC=true; clean=nm.slice(3); }
+          if(hard!==isHC) continue;
+          out.push({name:clean, score:d[i].score});
+          if(out.length>=10) break;
+        }
+        finish(out);
+      })
+      .catch(function(){ finish(null); });
+  }
+  function setBoardTitle(){
+    var t=document.getElementById('boardTitle');
+    if(t) t.textContent = (difficulty==='hard') ? 'Рекорды — Хардкор' : 'Рекорды — Обычная';
+  }
+  function renderBoard(arr,myName,myScore){
+    var box=document.getElementById('boardRows');
+    if(arr===null){ box.innerHTML='<div class="bload">нет связи с сервером</div>'; return; }
+    if(!arr.length){ box.innerHTML='<div class="bload">пока пусто — будь первым!</div>'; return; }
+    var html='';
+    for(var i=0;i<arr.length;i++){
+      var nm=arr[i].name||'???', sc=(arr[i].score!=null?arr[i].score:0);
+      var mine=(myName && String(nm).toLowerCase()===myName.toLowerCase() && String(sc)===String(myScore));
+      html+='<div class="br'+(mine?' me':'')+'"><span class="rk">'+(i+1)+'</span>'+
+            '<span class="nm">'+nm+'</span><span class="sc">'+sc+'</span></div>';
+    }
+    box.innerHTML=html;
+  }
+
+  // ---- звуки действий (синтез, без файлов) ----
+  var AC=null, MASTER=null;
+  function ac(){ if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();MASTER=AC.createGain();MASTER.gain.value=1.6;MASTER.connect(AC.destination);}catch(e){}} return AC; }
+  var _voices=0;   // счётчик активных звуков (M9)
+  var MAX_VOICES=12;
+  function tone(freq,dur,type,vol,slideTo,delay){
+    var a=ac(); if(!a)return;
+    if(_voices>=MAX_VOICES) return;   // не плодим звуки при спаме
+    var t0=a.currentTime+(delay||0);
+    var o=a.createOscillator(),g=a.createGain();
+    o.type=type||'sine'; o.frequency.setValueAtTime(freq,t0);
+    if(slideTo)o.frequency.exponentialRampToValueAtTime(slideTo,t0+dur);
+    var v=vol||0.2;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(v,t0+0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.connect(g);g.connect(MASTER); o.start(t0);o.stop(t0+dur+0.02);
+    _voices++; o.onended=function(){ _voices--; };
+  }
+  function noiseBurst(dur,vol){
+    var a=ac(); if(!a)return;
+    if(_voices>=MAX_VOICES) return;
+    var n=Math.floor(a.sampleRate*dur), buf=a.createBuffer(1,n,a.sampleRate), d=buf.getChannelData(0);
+    for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
+    var s=a.createBufferSource();s.buffer=buf;
+    var g=a.createGain();g.gain.value=vol||0.3;
+    s.connect(g);g.connect(MASTER);s.start();
+    _voices++; s.onended=function(){ _voices--; };
+  }
+  // ---- настройки звука ----
+  var musicOn=true;
+  try{ if(localStorage.getItem('kunkka_music')==='0')musicOn=false; }catch(e){}
+  function applyAudio(){
+    try{ if(bgm) bgm.muted=!musicOn; }catch(e){}
+  }
+
+  var SFX={
+    eat:function(){tone(300,0.14,'sine',0.5,650);}, // мягкий «блуп» вверх — заметный, не резкий
+    squash:function(){noiseBurst(0.07,0.11);tone(150,0.08,'sine',0.18,70);}, // мягкий хлоп, выровнен по громкости
+    gold:function(){ // яркая золотая трель — запланирована по аудио-часам, громкая
+      tone(784,0.10,'triangle',0.55,null,0);     // соль
+      tone(1047,0.10,'triangle',0.55,null,0.09);  // до
+      tone(1568,0.16,'triangle',0.50,null,0.18);  // соль октавой выше
+    },
+    warn:function(){tone(170,0.16,'sawtooth',0.14,110);},          // тревога при удушении
+    rum:function(){ // довольный «гульп» вниз + звон
+      tone(400,0.12,'sine',0.45,180);
+      tone(620,0.14,'triangle',0.4,null,0.1);
+    },
+    click:function(){ tone(520,0.05,'sine',0.22,420); } // мягкий клик интерфейса
+  };
+  var warnSndT=0;
+  // мягкий клик на всех кнопках интерфейса
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    if(t && t.tagName==='BUTTON'){ try{ ac(); SFX.click(); }catch(err){} }
+  },true);
+
+  var S={},best=0;
+  try{best=parseInt(localStorage.getItem('kunkka_best')||'0',10)||0;}catch(e){best=0;}
+
+  // ---- статистика (Трюм) ----
+  var STATS={games:0,purple:0,gold:0,green:0,rum:0,bestLevel:1,bestHard:0};
+  try{ var ss=localStorage.getItem('kunkka_stats'); if(ss){ var o=JSON.parse(ss); for(var k in o) if(k in STATS) STATS[k]=o[k]; } }catch(e){}
+  function saveStats(){ try{localStorage.setItem('kunkka_stats',JSON.stringify(STATS));}catch(e){} }
+
+  // (Верфь удалена)
+  function updateQuestProgress(){}
+
+  // отслеживание открытых трофеев для уведомлений
+  var unlockedTrophies={};
+  try{ var ut=localStorage.getItem('kunkka_trophies'); if(ut) unlockedTrophies=JSON.parse(ut)||{}; }catch(e){}
+  function checkNewTrophies(){
+    if(typeof TROPHIES==='undefined') return;
+    var newly=[];
+    for(var i=0;i<TROPHIES.length;i++){
+      var t=TROPHIES[i], on=false;
+      try{on=t.test();}catch(e){on=false;}
+      if(on && !unlockedTrophies[t.id]){ unlockedTrophies[t.id]=1; newly.push(t.name); }
+    }
+    if(newly.length){
+      try{localStorage.setItem('kunkka_trophies',JSON.stringify(unlockedTrophies));}catch(e){}
+      // показываем уведомления по очереди
+      newly.forEach(function(nm,idx){
+        setTimeout(function(){ showTrophyToast(nm); }, idx*1400);
+      });
+    }
+  }
+  function showTrophyToast(name){
+    var el=document.getElementById('trophyToast');
+    if(!el) return;
+    el.querySelector('.tt-name').textContent=name;
+    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+    setTimeout(function(){ el.classList.remove('show'); }, 2600);
+  }
+
+  function reset(){
+    _ending=false;
+    SESSION={purple:0,gold:0,green:0,rum:0,score:0,level:1};
+    S={score:0,level:1,grapes:[],spawnT:0,spawnGap:950*dk().spawn,
+       drag:null,last:0,shake:0,flash:0,wasFull:false,mouthOpen:0,face:'idle',faceT:0,running:true,floaters:[],
+       particles:[],distress:0,goldT:0,rumT:0,goldPity:0,rumPity:0,rumGrace:0,rumCD:0,greenDry:0,kurazh:0,banner:null,bubble:null,_sayT:0};
+    warnSndT=0;
+    upd();
+  }
+  var _lastScore=0;
+  function upd(){
+    document.getElementById('sc').textContent=S.score;
+    document.getElementById('lv').textContent=S.level;
+    document.getElementById('gcount').textContent=greenCount();
+    SESSION.score=S.score;
+    SESSION.level=S.level;
+    if(S.score>_lastScore){
+      var sp=document.querySelector('.hud .score');
+      if(sp){ sp.classList.remove('pulse'); void sp.offsetWidth; sp.classList.add('pulse'); }
+    }
+    _lastScore=S.score;
+  }
+
+  // заставка-баннер по центру (уровень / шторм)
+  function banner(text,color,ms){ S.banner={t:text,c:color||'#e8c061',life:ms||1300,max:ms||1300}; }
+
+  function levelUp(nl){
+    S.level=nl;
+    // пол 550мс, ускорение заметнее
+    S.spawnGap=Math.max(280,950-nl*62)*dk().spawn;
+    banner('Уровень '+nl,'#e8c061',1400);
+  }
+
+  // геометрия Кунки
+  function kunkaBox(){
+    var ratio=(kunkaImg.complete?kunkaImg.height/kunkaImg.width:2.0);
+    var kw=Math.min(W*0.78,344);
+    var kh=kw*ratio;
+    var maxH=H*0.62;
+    if(kh>maxH){ kh=maxH; kw=kh/ratio; }
+    var kx=W/2-kw/2, ky=16;
+    return {x:kx,y:ky,w:kw,h:kh,
+      mouthX:W/2, mouthY:ky+kh*0.52, mouthR:kw*0.30};
+  }
+
+  // рамка-портрет вокруг кадра Кунки (медальон капитана)
+  function drawPortraitFrame(x,y,w,h){
+    var fw=Math.max(10, w*0.05);   // толщина багета
+    // внешняя тёмная деревянная окантовка
+    ctx.lineJoin='miter';
+    // тёмное дерево (внешний кант)
+    ctx.strokeStyle='#241407';
+    ctx.lineWidth=fw*1.6;
+    ctx.strokeRect(x-fw*0.3, y-fw*0.3, w+fw*0.6, h+fw*0.6);
+    // основной латунный багет с градиентом
+    var fg=ctx.createLinearGradient(x,y,x,y+h);
+    fg.addColorStop(0,'#e8c061');
+    fg.addColorStop(0.25,'#b5882f');
+    fg.addColorStop(0.5,'#8a6420');
+    fg.addColorStop(0.75,'#b5882f');
+    fg.addColorStop(1,'#7a561c');
+    ctx.strokeStyle=fg;
+    ctx.lineWidth=fw;
+    ctx.strokeRect(x-fw*0.3, y-fw*0.3, w+fw*0.6, h+fw*0.6);
+    // тонкая тёмная линия по внутреннему краю багета (отделяет от фото)
+    ctx.strokeStyle='rgba(30,18,6,0.9)';
+    ctx.lineWidth=2;
+    ctx.strokeRect(x+1, y+1, w-2, h-2);
+    // блик по верхней кромке багета
+    ctx.strokeStyle='rgba(255,235,180,0.4)';
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(x-fw*0.7, y-fw*0.7); ctx.lineTo(x+w+fw*0.7, y-fw*0.7);
+    ctx.stroke();
+    // угловые заклёпки-болты
+    var bolts=[[x-fw*0.3,y-fw*0.3],[x+w+fw*0.3,y-fw*0.3],[x-fw*0.3,y+h+fw*0.3],[x+w+fw*0.3,y+h+fw*0.3]];
+    for(var i=0;i<bolts.length;i++){
+      var bx=bolts[i][0], by=bolts[i][1];
+      var bg2=ctx.createRadialGradient(bx-2,by-2,1,bx,by,fw*0.42);
+      bg2.addColorStop(0,'#f0d488'); bg2.addColorStop(1,'#6e4e1a');
+      ctx.fillStyle=bg2;
+      ctx.beginPath(); ctx.arc(bx,by,fw*0.42,0,6.28); ctx.fill();
+      ctx.strokeStyle='#3a2710'; ctx.lineWidth=1.5; ctx.stroke();
+    }
+  }
+
+  // ---- сложность ----
+  var DIFF={
+    normal:{choke:0.85, spawn:0.82, hits:0},   // живее чем было, но мягче хардкора
+    hard:  {choke:0.42, spawn:0.48, hits:1}     // ЖЕСТЬ: очень мало времени, очень частый спавн
+  };
+  var difficulty='normal';
+  function dk(){return DIFF[difficulty]||DIFF.normal;}
+
+  // сколько нажатий нужно на зелёный — растёт с уровнем
+  function greenHitsNeeded(){return Math.min(7, 2+Math.floor((S.level-1)/4)+dk().hits);}
+  // окно до удушения (мс) — сокращается с уровнем
+  function chokeWindow(){
+    var base=(4200-(S.level-1)*200)*dk().choke;
+    var floor=(difficulty==='hard')?1000:1500;   // хардкор жёстче, но не мгновенно
+    return Math.max(floor, base);
+  }
+
+
+  function spawn(forceType){
+    var sour = forceType ? (forceType==='sour') : false;
+    var gr=40+Math.random()*8;
+    var zoneTop=H*0.67, zoneBot=H*0.86;
+    var pos=freeX(gr,zoneTop,zoneBot);
+    if(!pos) return;
+    S.grapes.push({
+      x:pos[0], y:pos[1],
+      r:gr, sour:sour, gold:false, held:false,
+      hits:0, squashT:0, life:0,
+      vx:0, vy:0,
+      bob:Math.random()*6.28, vb:0.03+Math.random()*0.025, age:0
+    });
+  }
+  // поиск позиции: пробуем с убывающим зазором, в крайнем случае любое место (не null)
+  function freeX(gr, zoneTop, zoneBot){
+    var spacings=[1.35, 1.15, 0.95, 0.7];
+    for(var s=0;s<spacings.length;s++){
+      for(var attempt=0; attempt<14; attempt++){
+        var x=gr+Math.random()*(W-gr*2);
+        var y=zoneTop+Math.random()*(zoneBot-zoneTop);
+        var ok=true;
+        for(var i=0;i<S.grapes.length;i++){
+          var o=S.grapes[i];
+          var dx=x-o.x, dy=y-o.y;
+          var minD=(gr+o.r)*spacings[s];
+          if(dx*dx+dy*dy < minD*minD){ ok=false; break; }
+        }
+        if(ok) return [x,y];
+      }
+    }
+    // совсем нет места — ставим в случайную точку зоны (спавн не должен застревать)
+    return [gr+Math.random()*(W-gr*2), zoneTop+Math.random()*(zoneBot-zoneTop)];
+  }
+  function spawnGold(){
+    var gr=44+Math.random()*6;
+    var pos=freeX(gr,H*0.67,H*0.86);
+    if(!pos) return;
+    S.grapes.push({
+      x:pos[0], y:pos[1], r:gr, sour:true, gold:true, held:false,
+      hits:0, squashT:0, life:2600, vx:0, vy:0,
+      bob:Math.random()*6.28, vb:0.04+Math.random()*0.02, age:0
+    });
+  }
+  function spawnRum(){
+    var gr=46+Math.random()*4;
+    var pos=freeX(gr,H*0.67,H*0.86);
+    if(!pos) return;
+    S.grapes.push({
+      x:pos[0], y:pos[1], r:gr, sour:true, gold:false, rum:true, held:false,
+      hits:0, squashT:0, life:4200, vx:0, vy:0,
+      bob:Math.random()*6.28, vb:0.035+Math.random()*0.02, age:0
+    });
+  }
+  function hasRum(){for(var i=0;i<S.grapes.length;i++)if(S.grapes[i].rum)return true;return false;}
+  function sourCount(){var n=0;for(var i=0;i<S.grapes.length;i++){var g=S.grapes[i];if(g.sour&&!g.gold&&!g.rum)n++;}return n;}
+  function greenCount(){var n=0;for(var i=0;i<S.grapes.length;i++)if(!S.grapes[i].sour)n++;return n;}
+  function hasGold(){for(var i=0;i<S.grapes.length;i++)if(S.grapes[i].gold)return true;return false;}
+
+  function pointAt(px,py){
+    function hit(g){ return (px-g.x)*(px-g.x)+(py-g.y)*(py-g.y) < g.r*g.r*0.95; }
+    // 1) РОМ — спасение, хватаем первым
+    for(var a=S.grapes.length-1;a>=0;a--){ if(S.grapes[a].rum && hit(S.grapes[a])) return S.grapes[a]; }
+    // 2) ЗЕЛЁНЫЙ — угроза, тыкаем (важнее золота)
+    for(var c=S.grapes.length-1;c>=0;c--){ if(!S.grapes[c].sour && hit(S.grapes[c])) return S.grapes[c]; }
+    // 3) ЗОЛОТО — ценное
+    for(var b=S.grapes.length-1;b>=0;b--){ if(S.grapes[b].gold && hit(S.grapes[b])) return S.grapes[b]; }
+    // 4) ФИОЛЕТОВЫЙ — обычный
+    for(var d=S.grapes.length-1;d>=0;d--){ if(S.grapes[d].sour && !S.grapes[d].rum && !S.grapes[d].gold && hit(S.grapes[d])) return S.grapes[d]; }
+    return null;
+  }
+  var MAX_PARTICLES=160, MAX_FLOATERS=12;   // лимиты эффектов (H2)
+  var kunkaTaps=0, kunkaTapT=0;
+  // ЗАМЕНИ ТЕКСТ НИЖЕ НА СВОЮ ФРАЗУ ПАСХАЛКИ:
+  var EASTER_LINE='А ну не трогай капитана!';
+
+  // зажим координат перетаскивания в границы поля (C4)
+  function clampX(x,r){ return Math.max(r, Math.min(W-r, x)); }
+  function clampY(y,r){ return Math.max(r, Math.min(H-r, y)); }
+
+  // обработка одного «начала касания» в точке (общая для тача и мыши)
+  function beginAt(px,py){
+    if(!S.running)return;
+    var g=pointAt(px,py);
+    if(!g){
+      var kb=kunkaBox();
+      var inFace = px>kb.x && px<kb.x+kb.w && py>kb.y && py<kb.y+kb.h*0.6;
+      if(inFace){
+        var now=Date.now();
+        if(now-kunkaTapT>1500) kunkaTaps=0;
+        kunkaTapT=now; kunkaTaps++;
+        if(kunkaTaps>=15){ kunkaTaps=0; S._sayT=0; S.bubble={t:EASTER_LINE, life:1600, max:1600}; }
+      }
+      return null;
+    }
+    if(g.sour){
+      g.held=true; g.x=clampX(px,g.r); g.y=clampY(py,g.r);
+      return g;   // этот объект теперь тащится пальцем
+    } else {
+      g.hits++; g.squashT=120; SFX.squash();
+      burst(g.x,g.y,'#5fd83f',5);
+      if(g.hits>=greenHitsNeeded()){
+        burst(g.x,g.y,'#7ee84a',10);
+        STATS.green++; SESSION.green++;
+        if(Math.random()<0.2) say('squash');
+        removeGrape(g);
+      }
+      return null;
+    }
+  }
+
+  // завершение перетаскивания объекта g в точке
+  function endDrag(g){
+    if(!g)return;
+    if(!S.running){ g.held=false; return; }
+    var b=kunkaBox();
+    var d=Math.hypot(g.x-b.mouthX,g.y-b.mouthY);
+    if(d < b.mouthR+g.r){
+      S.face='happy'; S.faceT=600; S.mouthOpen=1;
+      if(g.rum){
+        for(var ri=S.grapes.length-1;ri>=0;ri--){
+          if(!S.grapes[ri].sour){ burst(S.grapes[ri].x,S.grapes[ri].y,'#7ee84a',8); S.grapes.splice(ri,1); }
+        }
+        S.score+=20; STATS.rum++; SESSION.rum++;
+        SFX.rum(); burst(g.x,g.y,'#d8a04a',24); say('rum');
+        S.flash=0; S.wasFull=false; S.greenFull=0;
+        S.rumGrace=2000;
+        S.kurazh=6000;   // 6 секунд КУРАЖА — очки x2
+        banner('КУРАЖ ×2','#ffd24a',1600);
+        floater(b.mouthX,b.mouthY-30,'КУРАЖ!','#ffd24a');
+        removeGrape(g); upd(); g.held=false; return;
+      }
+      var gain=g.gold?50:10;
+      if(S.kurazh>0) gain*=2;   // во время куража очки удваиваются
+      S.score+=gain;
+      if(g.gold){ STATS.gold++; SESSION.gold++; SFX.gold(); burst(g.x,g.y,'#ffd24a',16); say('gold'); }
+      else { STATS.purple++; SESSION.purple++; SFX.eat(); burst(g.x,g.y,'#c77bf0',8); if(Math.random()<0.15) say('eat'); }
+      floater(g.x,g.y,'+'+gain, g.gold?'#ffd24a':'#d9b3f0');
+      var nl=1+Math.floor(S.score/120);
+      SESSION.score=S.score;
+      if(nl!==S.level){ levelUp(nl); SESSION.level=nl; }
+      removeGrape(g); upd();
+    }
+    g.held=false;
+  }
+
+  // ---- МУЛЬТИТАЧ: каждый палец привязан к своему объекту через identifier (C3) ----
+  var activeTouches={};   // identifier -> grape (который тащит этот палец)
+  function canvasXY(clientX,clientY){
+    // координаты уже в системе экрана (canvas на весь экран), но на всякий случай учтём rect
+    var r=cv.getBoundingClientRect();
+    return [clientX-r.left, clientY-r.top];
+  }
+
+  function onTouchStart(e){
+    e.preventDefault();
+    for(var i=0;i<e.changedTouches.length;i++){
+      var t=e.changedTouches[i];
+      var xy=canvasXY(t.clientX,t.clientY);
+      var g=beginAt(xy[0],xy[1]);
+      if(g) activeTouches[t.identifier]=g;   // палец взял объект
+    }
+  }
+  function onTouchMove(e){
+    if(!S.running)return;
+    e.preventDefault();
+    for(var i=0;i<e.changedTouches.length;i++){
+      var t=e.changedTouches[i];
+      var g=activeTouches[t.identifier];
+      if(g){ var xy=canvasXY(t.clientX,t.clientY); g.x=clampX(xy[0],g.r); g.y=clampY(xy[1],g.r); }
+    }
+  }
+  function onTouchEndCancel(e){
+    e.preventDefault();
+    for(var i=0;i<e.changedTouches.length;i++){
+      var t=e.changedTouches[i];
+      var g=activeTouches[t.identifier];
+      if(g){ endDrag(g); delete activeTouches[t.identifier]; }
+    }
+  }
+
+  // ---- МЫШЬ (ПК) ----
+  var mouseDrag=null;
+  function onMouseDown(e){ var g=beginAt(e.clientX,e.clientY); if(g) mouseDrag=g; }
+  function onMouseMove(e){ if(!S.running||!mouseDrag)return; mouseDrag.x=clampX(e.clientX,mouseDrag.r); mouseDrag.y=clampY(e.clientY,mouseDrag.r); }
+  function onMouseUp(e){ if(mouseDrag){ endDrag(mouseDrag); mouseDrag=null; } }
+
+  function removeGrape(g){var i=S.grapes.indexOf(g);if(i>=0)S.grapes.splice(i,1);}
+  function floater(x,y,t,c){
+    if(S.floaters.length>=MAX_FLOATERS) S.floaters.shift();   // лимит (H2)
+    S.floaters.push({x:x,y:y,t:t,c:c,life:60});
+  }
+
+  // ---- реплики Кунки ----
+  var LINES={
+    eat:['Вкуснотища!','Ещё!','Добыча моя!','Отменно!'],
+    gold:['Золото!','Сокровище!','Богатеем!'],
+    squash:['Кислятина!','Фу, гадость!','За борт его!'],
+    rum:['РОМ! Наконец-то!','Ха-харр!'],
+    danger:['Душно!','Кхэ-кхэ!']
+  };
+  function say(kind){
+    var arr=LINES[kind]; if(!arr)return;
+    if(S._sayT && Date.now()-S._sayT<2200) return;
+    S._sayT=Date.now();
+    S.bubble={t:arr[Math.floor(Math.random()*arr.length)], life:1100, max:1100};
+  }
+  function burst(x,y,color,n){
+    n=n||8;
+    for(var i=0;i<n;i++){
+      if(S.particles.length>=MAX_PARTICLES) S.particles.shift();
+      var a=Math.random()*6.28,sp=1.5+Math.random()*4;
+      S.particles.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,r:2+Math.random()*3,c:color,life:26+Math.random()*16});
+    }
+  }
+
+  cv.addEventListener('touchstart',onTouchStart,{passive:false});
+  cv.addEventListener('touchmove',onTouchMove,{passive:false});
+  cv.addEventListener('touchend',onTouchEndCancel,{passive:false});
+  cv.addEventListener('touchcancel',onTouchEndCancel,{passive:false});  // отмена касания (потеря фокуса)
+  cv.addEventListener('mousedown',onMouseDown);
+  cv.addEventListener('mousemove',onMouseMove);
+  cv.addEventListener('mouseup',onMouseUp);
+
+  // ---- сцена смерти: Кунка душится + поднимается зелёный дым, потом таблица ----
+  var death=null; // {t, puffs:[]}
+  var _smokeSprite=null;
+  var _ending=false;
+  var _deathAlive=false;
+  function startDeath(){
+    if(_deathAlive) return;    // уже идёт — не плодим второй цикл (проверка ДО создания)
+    death={t:0, dur:2800, puffs:[]};
+    for(var i=0;i<36;i++){
+      death.puffs.push({
+        x:Math.random()*W,
+        baseY:H+Math.random()*60,
+        r:70+Math.random()*100,
+        rise:0.10+Math.random()*0.10,
+        sway:Math.random()*6.28,
+        swaySpd:0.6+Math.random()*0.8,
+        delay:Math.random()*900,
+        seed:Math.random()
+      });
+    }
+    deathLast=0;
+    _deathAlive=true;
+    _lastDeathTs=Date.now();
+    requestAnimationFrame(deathLoop);
+  }
+  var _lastDeathTs=0;
+  var deathLast=0;
+  function deathLoop(ts){
+    if(!death){ _deathAlive=false; return; }
+    if(!deathLast)deathLast=ts;
+    var dt=ts-deathLast; deathLast=ts;
+    if(dt>40)dt=40;            // защита от скачка после сворачивания телефона
+    death.t+=dt;
+
+    ctx.clearRect(0,0,W,H);
+    // фон — морская картинка (как в основной игре)
+    if(seaBg._ok && seaBg.naturalWidth){
+      var iw=seaBg.naturalWidth, ih=seaBg.naturalHeight;
+      var scl=Math.max(W/iw, H/ih);
+      ctx.drawImage(seaBg, (W-iw*scl)/2, (H-ih*scl)/2, iw*scl, ih*scl);
+    } else {
+      ctx.fillStyle='#0c0905'; ctx.fillRect(0,0,W,H);
+    }
+    var b=kunkaBox();
+    var img=(chokeImg.complete?chokeImg:kunkaImg);
+    // плавное качание из стороны в сторону во время удушения
+    var dshake=Math.max(0, 1-death.t/2400);
+    var dsx=Math.sin(death.t/130)*7*dshake;
+    var dsy=0;
+    ctx.save();
+    ctx.translate(dsx,dsy);
+    if(img.complete){
+      ctx.fillStyle='#080604'; ctx.fillRect(b.x,b.y,b.w,b.h);
+      ctx.drawImage(img, b.x, b.y, b.w, b.h);
+    }
+    drawPortraitFrame(b.x,b.y,b.w,b.h);
+    ctx.restore();
+
+    // тёмный мягкий дым — рисуем кешированный спрайт (красиво как градиент, быстро как картинка)
+    var prog=Math.min(1,death.t/1900);
+    if(!_smokeSprite){
+      _smokeSprite=document.createElement('canvas');
+      _smokeSprite.width=_smokeSprite.height=128;
+      var sc2=_smokeSprite.getContext('2d');
+      var sg=sc2.createRadialGradient(64,64,4,64,64,64);
+      sg.addColorStop(0,'rgba(48,58,40,0.85)');
+      sg.addColorStop(0.5,'rgba(30,37,26,0.45)');
+      sg.addColorStop(1,'rgba(16,18,14,0)');
+      sc2.fillStyle=sg; sc2.fillRect(0,0,128,128);
+    }
+    ctx.save();
+    for(var i=0;i<death.puffs.length;i++){
+      var p=death.puffs[i];
+      var lt=death.t-p.delay; if(lt<0) continue;
+      var up=(lt/1000)*p.rise*H*1.6;
+      var y=p.baseY - up;
+      var x=p.x + Math.sin(p.sway+lt/700*p.swaySpd)*22;
+      var alpha=Math.min(0.7, lt/700*0.7) * (0.7+0.3*p.seed);
+      var rad=p.r*(1+lt/2600);
+      ctx.globalAlpha=alpha;
+      ctx.drawImage(_smokeSprite, x-rad, y-rad, rad*2, rad*2);
+    }
+    ctx.globalAlpha=1;
+    ctx.restore();
+    // лёгкое общее затемнение к концу (тёмное, в тон фона — края фото не выделяются)
+    ctx.fillStyle='rgba(8,7,6,'+(prog*0.30)+')';
+    ctx.fillRect(0,0,W,H);
+    // затемнение в самом конце — плавный уход в таблицу
+    var fadeOut=Math.max(0,(death.t-(death.dur-600))/600);
+    if(fadeOut>0){ ctx.fillStyle='rgba(8,5,16,'+fadeOut+')'; ctx.fillRect(0,0,W,H); }
+
+    if(death.t>=death.dur){
+      death=null; deathLast=0; _deathAlive=false;
+      showOverScreen();   // теперь открываем таблицу
+      return;
+    }
+    _lastDeathTs=Date.now();
+    requestAnimationFrame(deathLoop);
+  }
+
+  function showOverScreen(){
+    // СБРОС прозрачности — на случай если fadein/opacity застряли
+    game.classList.remove('fadein');
+    game.style.opacity='1';
+    death=null; _deathAlive=false;
+    // вернуть элементы, которые могли быть скрыты режимом «только таблица»
+    document.getElementById('overtitle').textContent='Кунка задохнулся!';
+    document.getElementById('finsc').parentElement.style.display='';
+    document.getElementById('overbest').style.display='';
+    document.getElementById('again').style.display='';
+    document.getElementById('finsc').textContent=S.score;
+    // личный рекорд
+    var isNew=false;
+    if(S.score>best){ best=S.score; isNew=true; try{localStorage.setItem('kunkka_best',String(best));}catch(e){} }
+    var be=document.getElementById('overbest');
+    if(be) be.textContent = (isNew?('НОВЫЙ РЕКОРД! '+best):('Рекорд: '+best))+'  •  '+rank(best);
+    if(be) be.classList.toggle('isnew',isNew);
+    lastSubmitted=false;
+    document.getElementById('submitBox').style.display='flex';
+    document.getElementById('submitScore').disabled=false;
+    document.getElementById('submitScore').textContent='Записать рекорд';
+    document.getElementById('boardRows').innerHTML='<div class="bload">загрузка…</div>';
+    setBoardTitle();
+    lbLoad(function(arr){ renderBoard(arr,null,null); });
+    over.style.display='flex';
+    game.style.display='none';
+  }
+
+  // показ таблицы лидеров из меню (без формы записи и счёта)
+  function showLeaderboardOnly(){
+    try{
+      document.getElementById('overtitle').textContent='Таблица рекордов';
+      var fin=document.querySelector('#over .fin'); if(fin) fin.style.display='none';
+      document.getElementById('overbest').style.display='none';
+      document.getElementById('submitBox').style.display='none';
+      document.getElementById('again').style.display='none';
+    }catch(e){}
+    document.getElementById('boardRows').innerHTML='<div class="bload">загрузка…</div>';
+    try{ setBoardTitle(); }catch(e){}
+    // спрятать все прочие экраны
+    menu.style.display='none';
+    var sc=document.getElementById('settings'); if(sc) sc.style.display='none';
+    var hw=document.getElementById('howto'); if(hw) hw.style.display='none';
+    var hd=document.getElementById('hold'); if(hd) hd.style.display='none';
+    game.style.display='none';
+    over.style.display='flex';
+    lbLoad(function(arr){ renderBoard(arr,null,null); });
+  }
+
+  function end(win){
+    if(_ending)return;        // защита от повторного вызова
+    _ending=true;
+    S.running=false;
+    _loopAlive=false;
+    document.body.classList.remove('ingame');
+    // статистика Трюма
+    STATS.games++;
+    if(S.level>STATS.bestLevel) STATS.bestLevel=S.level;
+    if(difficulty==='hard' && S.score>STATS.bestHard) STATS.bestHard=S.score;
+    saveStats();
+    checkNewTrophies();
+    updateQuestProgress();
+    document.getElementById('overtitle').textContent = win?'Кунка наелся вдоволь!':'Кунка задохнулся!';
+    if(win){
+      // победы тут нет, но на всякий случай — сразу к таблице без сцены
+      showOverScreen(); return;
+    }
+    // проигрыш: сначала сцена смерти на игровом поле, потом таблица
+    startDeath();
+  }
+
+  function update(dt){
+    if(!S.running)return;
+    var gc=greenCount();
+    document.getElementById('gcount').textContent=gc;
+
+    if(gc<4){
+      // зелёных меньше 4 — угроза ещё не набралась
+      S.greenFull=0;
+      S.spawnT+=dt;
+      if(S.spawnT>S.spawnGap && S.grapes.length<10){
+        S.spawnT=0;
+        var sourCap=5;
+        var sc=sourCount();
+        var greenChance=Math.min(0.72,0.45+S.level*0.012);
+        if(gc<=1) greenChance=Math.min(0.85,greenChance+0.2);
+        greenChance=Math.min(0.92, greenChance + (S.greenDry||0)*0.12);
+        var grace=(S.rumGrace||0)>0;
+        var rollGreen=Math.random()<greenChance && !grace;
+        if(rollGreen){
+          spawn('green'); S.greenDry=0;
+        } else if(sc<sourCap){
+          spawn('sour'); S.greenDry=(S.greenDry||0)+1;
+        } else if(!grace){
+          spawn('green'); S.greenDry=0;
+        }
+      }
+    }else{
+      // 4 зелёных накопилось — пошёл таймер до проигрыша
+      if(!S.wasFull){ // момент входа в опасность — вспышка и тряска
+        S.shake=Math.max(S.shake||0,16);
+        S.flash=1;
+        SFX.warn();
+        say('danger');
+      }
+      S.wasFull=true;
+      S.greenFull=(S.greenFull||0)+dt;
+      if(S.greenFull>chokeWindow()){ end(false); }
+    }
+    if(gc<4) S.wasFull=false;
+    if(S.rumGrace>0) S.rumGrace-=dt;   // тает передышка после рома
+    if(S.kurazh>0) S.kurazh-=dt;       // тает кураж (x2 очки)
+
+    // distress: нарастает когда зелёных 4 (Кунке плохо), плавно спадает иначе
+    var target=(gc>=4)?1:0;
+    S.distress += (target - S.distress) * Math.min(1, dt/220);
+    if(gc>=4){
+      warnSndT-=dt; if(warnSndT<=0){SFX.warn(); warnSndT=620;}
+    }else{ warnSndT=0; }
+
+    // золото — редкое. Не появляется в горячий момент (зелёных 3+), чтобы не мешать
+    S.goldT=(S.goldT||0)+dt;
+    S.goldPity=(S.goldPity||0)+dt;
+    if(!hasGold() && gc<3){
+      if(S.goldPity>=35000){ spawnGold(); S.goldT=0; S.goldPity=0; }
+      else if(S.goldT>3000){ S.goldT=0; if(Math.random()<0.16){ spawnGold(); S.goldPity=0; } }
+    } else if(hasGold()){ S.goldPity=0; }
+
+    // ром — бонус КУРАЖ (x2 очки). Появляется периодически, за ним охотишься.
+    if(S.rumCD>0) S.rumCD-=dt;
+    if(hasRum()){
+      S.rumT=0;
+    } else if(S.rumCD>0){
+      // на перезарядке
+    } else {
+      S.rumT=(S.rumT||0)+dt;
+      // появляется каждые ~11с (чуть быстрее если есть зелёная угроза — двойная польза)
+      var need = gc>=2 ? 8000 : 11000;
+      if(S.rumT>=need){
+        spawnRum(); S.rumT=0; S.rumCD=4000;   // короткий кулдаун — ром заметная часть игры
+      }
+    }
+
+    for(var i=S.grapes.length-1;i>=0;i--){
+      var g=S.grapes[i];
+      g.age=(g.age||0)+dt;
+      if(!g.held){
+        g.bob+=g.vb;
+        // дрейф фиолетовых с отскоком от краёв
+        if(g.vx||g.vy){
+          g.x+=g.vx; g.y+=g.vy;
+          if(g.x<g.r){g.x=g.r;g.vx=-g.vx;} if(g.x>W-g.r){g.x=W-g.r;g.vx=-g.vx;}
+          var top=H*0.63, bot=H*0.90;
+          if(g.y<top){g.y=top;g.vy=-g.vy;} if(g.y>bot){g.y=bot;g.vy=-g.vy;}
+        }
+        // золото исчезает по таймеру
+        if(g.life>0){ g.life-=dt; if(g.life<=0){ S.grapes.splice(i,1); continue; } }
+      }
+      if(g.squashT>0)g.squashT-=dt;
+    }
+    if(S.faceT>0){S.faceT-=dt;if(S.faceT<=0)S.face='idle';}
+    if(S.mouthOpen>0)S.mouthOpen-=dt/600;if(S.mouthOpen<0)S.mouthOpen=0;
+    for(var pp=S.particles.length-1;pp>=0;pp--){
+      var pt=S.particles[pp];
+      pt.x+=pt.vx; pt.y+=pt.vy; pt.vy+=0.22; pt.vx*=0.98;
+      pt.life--; if(pt.life<=0)S.particles.splice(pp,1);
+    }
+    for(var j=S.floaters.length-1;j>=0;j--){
+      var f=S.floaters[j];
+      f.y+=(f.vy||(-0.6)); if(f.vx)f.x+=f.vx;
+      f.life--;if(f.life<=0)S.floaters.splice(j,1);
+    }
+    if(S.shake>0) S.shake*=0.86;
+    if(S.flash>0) S.flash-=dt/400;
+    if(S.banner){ S.banner.life-=dt; if(S.banner.life<=0)S.banner=null; }
+    if(S.bubble){ S.bubble.life-=dt; if(S.bubble.life<=0)S.bubble=null; }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // фон: морская картинка (cover-fit), если загружена; иначе тёмный градиент
+    if(seaBg._ok && seaBg.naturalWidth){
+      var iw=seaBg.naturalWidth, ih=seaBg.naturalHeight;
+      var scale=Math.max(W/iw, H/ih);
+      var dw=iw*scale, dh=ih*scale;
+      ctx.drawImage(seaBg, (W-dw)/2, (H-dh)/2, dw, dh);
+    } else {
+      if(!S._bgGrad || S._bgGradH!==H){
+        var bg=ctx.createLinearGradient(0,0,0,H);
+        bg.addColorStop(0,'#0a0805');
+        bg.addColorStop(0.55,'#0c0905');
+        bg.addColorStop(1,'#161009');
+        S._bgGrad=bg; S._bgGradH=H;
+      }
+      ctx.fillStyle=S._bgGrad; ctx.fillRect(0,0,W,H);
+    }
+    var sx=0,sy=0;
+    if(S.shake>0){sx=(Math.random()-.5)*S.shake;sy=(Math.random()-.5)*S.shake;S.shake*=.85;if(S.shake<.5)S.shake=0;}
+    ctx.save();ctx.translate(sx,sy);
+
+    var b=kunkaBox();
+    var gc=greenCount();
+    var dis=S.distress||0; // 0..1 уровень страдания
+
+    // лёгкое покачивание/дрожь Кунки когда ему плохо
+    var tilt = dis>0.02 ? Math.sin(Date.now()/90)*0.03*dis : 0;
+    var jitterY = 0;   // без вертикальной дрожи — чтобы не было видимых смещений кадра
+
+    // выбор кадра: кричит когда ест ИЛИ когда задыхается (dis высок)
+    var screaming = (S.mouthOpen>0) || (dis>0.5);
+    var face=(screaming && kunkaOpenImg.complete)?kunkaOpenImg:kunkaImg;
+
+    ctx.save();
+    // поворот вокруг центра лица
+    ctx.translate(b.x+b.w/2, b.y+b.h/2);
+    ctx.rotate(tilt);
+    ctx.translate(-(b.x+b.w/2), -(b.y+b.h/2));
+
+    if(face.complete){
+      ctx.fillStyle='#080604';
+      ctx.fillRect(b.x,b.y,b.w,b.h);
+      ctx.drawImage(face, b.x, b.y+jitterY, b.w, b.h);
+    }
+
+    // ---- рамка-портрет (медальон капитана) ----
+    drawPortraitFrame(b.x,b.y,b.w,b.h);
+    ctx.restore();
+
+    // тёмно-красная пульсирующая виньетка ТОЛЬКО по краям — сигнал опасности, смягчена
+    if(dis>0.04 && S.running){
+      var pulse=0.5+0.5*Math.sin(Date.now()/160);
+      var inner=Math.max(W,H)*0.52, outer=Math.max(W,H)*0.98;
+      var grd=ctx.createRadialGradient(W/2,H*0.45,inner,W/2,H*0.45,outer);
+      var aEdge=0.34*dis*(0.6+0.4*pulse);
+      grd.addColorStop(0,'rgba(0,0,0,0)');
+      grd.addColorStop(0.6,'rgba('+Math.floor(90*dis)+',12,20,'+(aEdge*0.4)+')');
+      grd.addColorStop(1,'rgba('+Math.floor(140*dis)+',16,26,'+aEdge+')');
+      ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+    }
+
+    // виноградины
+    for(var i=0;i<S.grapes.length;i++){
+      var g=S.grapes[i];
+      var bobY=g.held?0:Math.sin(g.bob)*5;
+      // бутылка рома — спрайт
+      if(g.rum){
+        if(g.life>0 && g.life<900 && Math.floor(Date.now()/120)%2===0){ continue; }
+        var rh=g.r*2.3, rw=rh*(rumImg.complete?rumImg.width/rumImg.height:0.55);
+        ctx.save();
+        if(rumImg.complete){
+          ctx.drawImage(rumImg, g.x-rw/2, g.y-rh/2+bobY, rw, rh);
+        }else{
+          ctx.fillStyle='#9c5f25';ctx.beginPath();ctx.arc(g.x,g.y+bobY,g.r,0,6.28);ctx.fill();
+        }
+        ctx.restore();
+        continue;
+      }
+      var img=g.gold?goldImg:(g.sour?purpleImg:greenImg);
+      var s=g.r*2.2;
+      // зелёный чуть уменьшается с каждым кликом, но НЕ меньше 60% — иначе исчезает/ломается
+      // зелёный уменьшается пропорционально нужным кликам: от 1.0 до 0.45 за need нажатий
+      var shrink=1;
+      if(!g.sour){
+        var need=greenHitsNeeded();
+        var prog=Math.min(1, g.hits/need);
+        shrink=1 - prog*0.55;   // каждый клик заметно уменьшает, итог ~0.45
+      }
+      var squashX=1, squashY=1;
+      if(g.squashT>0){var q=g.squashT/120; squashX=1+q*0.3; squashY=1-q*0.3;}
+      var sw=s*shrink*squashX, sh=s*shrink*squashY;
+      // «поп» при появлении: рост от 0 с лёгким перелётом за ~220мс
+      var pop=1;
+      if(g.age!=null && g.age<260){
+        var pt=g.age/260;
+        pop = pt<0.7 ? (pt/0.7)*1.12 : (1.12-(pt-0.7)/0.3*0.12);
+      }
+      sw*=pop; sh*=pop;
+      // мигание золота перед исчезновением
+      if(g.gold && g.life>0 && g.life<800 && Math.floor(Date.now()/120)%2===0){ continue; }
+      // мягкая тень под виноградом — добавляет объём
+      ctx.save();
+      ctx.globalAlpha=0.28;
+      ctx.fillStyle='#000';
+      ctx.beginPath();
+      ctx.ellipse(g.x, g.y+bobY+sh*0.42, sw*0.34, sh*0.12, 0, 0, 6.28);
+      ctx.fill();
+      ctx.restore();
+      if(img.complete){
+        if(g.gold){
+          // дешёвое свечение без shadowBlur: полупрозрачный жёлтый круг
+          var gp=0.5+0.3*Math.sin(g.bob*2);
+          var rg=ctx.createRadialGradient(g.x,g.y+bobY,sw*0.2,g.x,g.y+bobY,sw*0.75);
+          rg.addColorStop(0,'rgba(255,215,90,'+(0.45*gp)+')');
+          rg.addColorStop(1,'rgba(255,215,90,0)');
+          ctx.fillStyle=rg;
+          ctx.fillRect(g.x-sw*0.75,g.y+bobY-sw*0.75,sw*1.5,sw*1.5);
+        }
+        ctx.drawImage(img,g.x-sw/2,g.y-sh/2+bobY,sw,sh);
+      }else{
+        ctx.beginPath();ctx.arc(g.x,g.y+bobY,g.r*shrink,0,6.28);
+        ctx.fillStyle=g.gold?'#ffd24a':(g.sour?'#7d2bb0':'#5fd83f');ctx.fill();
+      }
+    }
+
+    // брызги-частицы
+    for(var pc=0;pc<S.particles.length;pc++){
+      var ptc=S.particles[pc];
+      ctx.globalAlpha=Math.max(0,ptc.life/42);
+      ctx.fillStyle=ptc.c;
+      ctx.beginPath();ctx.arc(ptc.x,ptc.y,ptc.r,0,6.28);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+
+    // всплывающий текст
+    for(var k=0;k<S.floaters.length;k++){
+      var f=S.floaters[k];
+      var a=Math.max(0,f.life/60);
+      ctx.globalAlpha=a;
+      var fz=Math.floor(24+(1-a)*8);
+      ctx.font='900 '+fz+'px "Cinzel",Georgia,serif';ctx.textAlign='center';
+      ctx.lineWidth=4;ctx.strokeStyle='rgba(0,0,0,0.7)';
+      ctx.strokeText(f.t,f.x,f.y);
+      ctx.fillStyle=f.c;ctx.fillText(f.t,f.x,f.y);
+      ctx.globalAlpha=1;
+    }
+    ctx.restore();
+
+    // пузырь реплики Кунки — на груди спрайта, не на лице
+    if(S.bubble && S.running){
+      var bb=S.bubble;
+      var bAl=Math.min(1, (bb.life>bb.max-200)?(bb.max-bb.life)/200:bb.life/300);
+      var kb=kunkaBox();
+      var bh=32;
+      var bx=kb.mouthX, by=kb.y + kb.h*0.13;  // зона лба / над бровями
+      // не давать пузырю налезать на верхний интерфейс (пауза/счёт): держим ниже HUD
+      var minCenter=72 + bh/2;
+      if(by<minCenter) by=minCenter;
+      ctx.save();
+      ctx.globalAlpha=Math.max(0,Math.min(1,bAl));
+      ctx.font='700 17px "Cinzel",Georgia,serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      var tw=ctx.measureText(bb.t).width, pad=13, bw=tw+pad*2;
+      var rx=bx-bw/2, ry=by-bh/2;
+      ctx.fillStyle='rgba(243,220,170,0.96)';ctx.strokeStyle='#6e4e1d';ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(rx+6,ry);ctx.lineTo(rx+bw-6,ry);ctx.quadraticCurveTo(rx+bw,ry,rx+bw,ry+6);
+      ctx.lineTo(rx+bw,ry+bh-6);ctx.quadraticCurveTo(rx+bw,ry+bh,rx+bw-6,ry+bh);
+      ctx.lineTo(rx+6,ry+bh);ctx.quadraticCurveTo(rx,ry+bh,rx,ry+bh-6);
+      ctx.lineTo(rx,ry+6);ctx.quadraticCurveTo(rx,ry,rx+6,ry);ctx.closePath();
+      ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.moveTo(bx-7,ry+bh);ctx.lineTo(bx,ry+bh+10);ctx.lineTo(bx+7,ry+bh);ctx.closePath();
+      ctx.fillStyle='rgba(243,220,170,0.96)';ctx.fill();
+      ctx.strokeStyle='#6e4e1d';ctx.beginPath();ctx.moveTo(bx-7,ry+bh);ctx.lineTo(bx,ry+bh+10);ctx.lineTo(bx+7,ry+bh);ctx.stroke();
+      ctx.fillStyle='#3a2710';ctx.fillText(bb.t,bx,by);
+      ctx.restore();
+    }
+
+    // красная вспышка опасности — радиальная (только по краям, центр чист),
+    // чтобы не подсвечивать прямоугольные границы фото Кунки
+    if(S.flash>0){
+      var fa=Math.max(0,S.flash);
+      var rg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.25, W/2,H/2,Math.max(W,H)*0.62);
+      rg.addColorStop(0,'rgba(200,30,20,0)');
+      rg.addColorStop(1,'rgba(200,30,20,'+(fa*0.55)+')');
+      ctx.fillStyle=rg;
+      ctx.fillRect(0,0,W,H);
+    }
+
+    // золотое свечение по краям во время КУРАЖА (x2 очки)
+    if(S.kurazh>0){
+      var kpulse=0.6+0.4*Math.sin(Date.now()/180);
+      var ka=Math.min(1,S.kurazh/6000);
+      var kg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.30, W/2,H/2,Math.max(W,H)*0.62);
+      kg.addColorStop(0,'rgba(255,200,80,0)');
+      kg.addColorStop(1,'rgba(255,190,60,'+(0.35*ka*kpulse)+')');
+      ctx.fillStyle=kg;
+      ctx.fillRect(0,0,W,H);
+    }
+
+    // центральный баннер (уровень)
+    if(S.banner){
+      var bl=S.banner;
+      var t=1-(bl.life/bl.max);  // 0..1 от появления к концу
+      // прозрачность: быстрый вход (0-0.2), плавный выход (0.6-1.0)
+      var al;
+      if(t<0.2) al=t/0.2;
+      else if(t>0.6) al=Math.max(0,1-(t-0.6)/0.4);
+      else al=1;
+      // лёгкий подъём вверх по ходу анимации
+      var by=H*0.32 - t*22;
+      var fz=42;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      // подгоняем размер шрифта чтобы текст влез по ширине экрана
+      ctx.font='900 '+fz+'px "Cinzel Decorative","Cinzel",Georgia,serif';
+      var maxW=W*0.86;
+      var tw=ctx.measureText(bl.t).width;
+      if(tw>maxW){ fz=Math.max(20, Math.floor(fz*maxW/tw)); }
+      ctx.globalAlpha=Math.max(0,al);
+      ctx.font='900 '+fz+'px "Cinzel Decorative","Cinzel",Georgia,serif';
+      ctx.lineWidth=6;ctx.strokeStyle='rgba(0,0,0,0.75)';
+      ctx.strokeText(bl.t,W/2,by);
+      ctx.fillStyle=bl.c;ctx.fillText(bl.t,W/2,by);
+      ctx.textBaseline='alphabetic';ctx.globalAlpha=1;
+    }
+  }
+
+  var _loopAlive=false;
+  function startLoop(){ if(_loopAlive)return; _loopAlive=true; S.last=0; requestAnimationFrame(loop); }
+  function loop(ts){
+    _lastLoopTs=Date.now();    // отметка живого кадра — в начале
+    if(!S.last)S.last=ts;
+    var dt=ts-S.last;S.last=ts;
+    if(dt>100)dt=16;            // защита от скачка после паузы/сворачивания
+    try{
+      if(countdown){
+        countdown.t+=dt;
+        draw();
+        drawCountdown();
+        if(countdown.t>=900){ countdown.n--; countdown.t=0; if(countdown.n<=0){countdown=null;S.running=true;} }
+        requestAnimationFrame(loop);
+        return;
+      }
+      update(dt);draw();
+    }catch(err){
+      if(window.console&&console.error) console.error('loop error:',err);
+    }
+    if(S.running && game.style.display!=='none'){ requestAnimationFrame(loop); }
+    else { _loopAlive=false; }
+  }
+  // СТОРОЖ: если игра идёт, а цикл умер (завис/выпал) — поднимаем заново
+  var _lastLoopTs=0;
+  setInterval(function(){
+    if(S && S.running && game.style.display!=='none'){
+      // принудительно держим поле непрозрачным во время игры
+      if(game.style.opacity!=='1'){ game.style.opacity='1'; }
+      if(game.classList.contains('fadein')){ game.classList.remove('fadein'); }
+      // перезапуск если кадров не было больше 1.5 секунды (цикл реально завис)
+      if(_lastLoopTs && (Date.now()-_lastLoopTs) > 1500){
+        if(S.shake>30) S.shake=0;   // сбросить застрявшую тряску
+        _loopAlive=false;
+        startLoop();
+      }
+    }
+    // сторож сцены смерти: завис больше 2.5с — форсируем таблицу
+    if(death && _deathAlive){
+      if(_lastDeathTs && Date.now()-_lastDeathTs > 2500){
+        death=null; deathLast=0; _deathAlive=false;
+        try{ showOverScreen(); }catch(e){}
+      }
+    }
+    if(death && !_deathAlive){
+      death=null; deathLast=0;
+      try{ showOverScreen(); }catch(e){}
+    }
+  }, 800);
+  // картинки цифр отсчёта
+  var cdImg={'3':new Image(),'2':new Image(),'1':new Image()};
+  cdImg['3'].src='cd_3.png'; cdImg['2'].src='cd_2.png'; cdImg['1'].src='cd_1.png';
+  function drawCountdown(){
+    ctx.save();
+    ctx.fillStyle='rgba(14,8,3,0.7)';ctx.fillRect(0,0,W,H);
+    var p=Math.min(1,countdown.t/900);
+    var cx=W/2, cy=H*0.42;
+    var label=countdown.n>0?String(countdown.n):'';
+    if(!label){ ctx.restore(); return; }
+
+    var pop = p<0.16 ? (0.82+0.18*(p/0.16)) : 1;
+    var alpha = p>0.86 ? (1-(p-0.86)/0.14) : 1;
+    ctx.globalAlpha=Math.max(0,Math.min(1,alpha));
+
+    var img=cdImg[label];
+    var size=Math.round(190*pop);   // высота цифры на экране
+    if(img && img.complete && img.naturalWidth){
+      ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+      ctx.drawImage(img, cx-size/2, cy-size/2, size, size);
+    } else {
+      // запасной вариант, пока картинка грузится
+      ctx.font='bold '+Math.round(150*pop)+'px Georgia,serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle='#e0b03f'; ctx.fillText(label, cx, cy);
+    }
+    ctx.globalAlpha=1;
+    ctx.restore();
+  }
+
+  // звание по личному рекорду
+  var RANKS=[
+    {n:'Салага',s:0},
+    {n:'Юнга',s:30},
+    {n:'Матрос',s:80},
+    {n:'Старший матрос',s:160},
+    {n:'Боцман',s:280},
+    {n:'Штурман',s:450},
+    {n:'Старпом',s:680},
+    {n:'Капитан',s:1000},
+    {n:'Командор',s:1500},
+    {n:'Адмирал',s:2200},
+    {n:'Морской Волк',s:3200}
+  ];
+  function rank(score){
+    var r=RANKS[0].n;
+    for(var i=0;i<RANKS.length;i++) if(score>=RANKS[i].s) r=RANKS[i].n;
+    return r;
+  }
+  function rankProgress(score){
+    var cur=RANKS[0], nxt=null;
+    for(var i=0;i<RANKS.length;i++){
+      if(score>=RANKS[i].s){ cur=RANKS[i]; nxt=RANKS[i+1]||null; }
+    }
+    if(!nxt) return {name:cur.n, pct:100, next:null, need:0};
+    var pct=Math.round((score-cur.s)/(nxt.s-cur.s)*100);
+    return {name:cur.n, pct:Math.max(0,Math.min(100,pct)), next:nxt.n, need:nxt.s};
+  }
+  // ---- трофеи ---- (пороги под текущую сложность)
+  var TROPHIES=[
+    {id:'first', name:'Первый заплыв', test:function(){return STATS.games>=1;}},
+    {id:'games25', name:'25 заплывов', test:function(){return STATS.games>=25;}},
+    {id:'games100', name:'100 заплывов', test:function(){return STATS.games>=100;}},
+    {id:'p500',  name:'500 фиолетовых', test:function(){return STATS.purple>=500;}},
+    {id:'p2500', name:'2500 фиолетовых', test:function(){return STATS.purple>=2500;}},
+    {id:'g30',   name:'30 золотых', test:function(){return STATS.gold>=30;}},
+    {id:'g150',  name:'150 золотых', test:function(){return STATS.gold>=150;}},
+    {id:'green500',name:'500 раздавленных', test:function(){return STATS.green>=500;}},
+    {id:'rum30', name:'30 бутылок рома', test:function(){return STATS.rum>=30;}},
+    {id:'score500',  name:'500 очков', test:function(){return best>=500;}},
+    {id:'score1000', name:'1000 очков', test:function(){return best>=1000;}},
+    {id:'score2000', name:'2000 очков', test:function(){return best>=2000;}},
+    {id:'hard500', name:'Хардкор: 500', test:function(){return STATS.bestHard>=500;}},
+    {id:'hard1200',name:'Хардкор: 1200', test:function(){return STATS.bestHard>=1200;}},
+    {id:'seawolf', name:'Морской Волк', test:function(){return best>=3200;}}
+  ];
+  function refreshMenuBest(){
+    var el=document.getElementById('menuBest');
+    if(el) el.textContent = best>0 ? ('Рекорд: '+best+'  •  '+rank(best)) : '';
+  }
+  refreshMenuBest();
+
+  // обратный отсчёт перед стартом
+  var countdown=null;
+  function start(){
+    var a=ac(); if(a&&a.state==='suspended')a.resume();
+    menu.style.opacity='0';
+    reset();
+    S.running=false;            // пауза на время отсчёта
+    // плавное нарастание музыки вместо резкого включения
+    bgm.volume=0; bgm.currentTime=0; applyAudio(); bgm.play().catch(function(){});
+    var tv=0; var fadeMus=setInterval(function(){
+      tv+=0.06; if(tv>=0.7){ tv=0.7; clearInterval(fadeMus); }
+      try{ bgm.volume=musicOn?tv:0; }catch(e){}
+    },60);
+    countdown=null;             // отсчёт стартует после ухода меню
+    // ждём, пока меню плавно угаснет, и только потом показываем поле и отсчёт
+    setTimeout(function(){
+      menu.style.display='none'; menu.style.opacity='1';
+      over.style.display='none';
+      game.classList.remove('fadein');   // никакого затухания — показываем сразу
+      game.style.opacity='1';
+      game.style.display='block';
+      document.body.classList.add('ingame');
+      paused=false; var po=document.getElementById('pauseOverlay'); if(po)po.style.display='none';
+      document.getElementById('pause').textContent='II';
+      countdown={n:3,t:0};
+      _loopAlive=false;
+      startLoop();
+    }, 560);
+  }
+  document.getElementById('play').onclick=start;
+  document.getElementById('submitScore').onclick=function(){
+    if(lastSubmitted)return;
+    var name=lbClean(document.getElementById('pname').value);
+    if(!name){ document.getElementById('pname').focus(); return; }
+    var myScore=S.score;
+    var btn=this; btn.disabled=true; btn.textContent='отправка…';
+    lbSubmit(name,myScore,function(ok){
+      if(!ok){ btn.disabled=false; btn.textContent='Ошибка — ещё раз'; return; }
+      lastSubmitted=true;
+      document.getElementById('submitBox').style.display='none';
+      document.getElementById('boardRows').innerHTML='<div class="bload">обновляем…</div>';
+      lbLoad(function(arr){ renderBoard(arr,name,myScore); });
+    });
+  };
+  document.getElementById('again').onclick=function(){
+    death=null;_deathAlive=false;over.style.display='none';
+    game.classList.remove('fadein'); game.style.opacity='1'; game.style.display='block';
+    document.body.classList.add('ingame');
+    paused=false; var po=document.getElementById('pauseOverlay'); if(po)po.style.display='none';
+    document.getElementById('pause').textContent='II';
+    reset();S.running=false;
+    countdown={n:3,t:0};
+    bgm.currentTime=0;applyAudio();bgm.play().catch(function(){});
+    _loopAlive=false;
+    startLoop();
+  };
+  document.getElementById('tomenu').onclick=function(){
+    death=null;_deathAlive=false;
+    over.style.display='none';game.style.display='none';bgm.pause();
+    document.body.classList.remove('ingame');
+    refreshMenuBest();
+    menu.style.display='flex';setTimeout(function(){menu.style.opacity='1';},20);
+  };
+  document.getElementById('showLb').onclick=function(){ showLeaderboardOnly(); };
+
+  // ---- настройки (только музыка) ----
+  var settings=document.getElementById('settings');
+  var tgMusic=document.getElementById('tgMusic');
+  function paintToggle(btn,on){ btn.textContent=on?'ВКЛ':'ВЫКЛ'; btn.classList.toggle('on',on); btn.classList.toggle('off',!on); }
+  function paintDiff(){
+    var bs=document.querySelectorAll('.diff');
+    for(var i=0;i<bs.length;i++) bs[i].classList.toggle('sel', bs[i].getAttribute('data-diff')===difficulty);
+  }
+  document.getElementById('showSettings').onclick=function(){
+    paintToggle(tgMusic,musicOn);
+    menu.style.display='none'; settings.style.display='block';
+  };
+  document.getElementById('settingsBack').onclick=function(){
+    settings.style.display='none'; menu.style.display='flex';
+  };
+  var howto=document.getElementById('howto');
+  document.getElementById('showHow').onclick=function(){
+    menu.style.display='none'; howto.style.display='block';
+  };
+  document.getElementById('howBack').onclick=function(){
+    howto.style.display='none'; menu.style.display='flex';
+  };
+  var hold=document.getElementById('hold');
+  function medalSVG(on){
+    var c1=on?'#e8c061':'#5a4a30', c2=on?'#9c6f28':'#3a3020';
+    return '<svg class="tmedal" viewBox="0 0 40 40">'+
+      '<circle cx="20" cy="17" r="12" fill="'+c1+'" stroke="'+c2+'" stroke-width="2"/>'+
+      '<circle cx="20" cy="17" r="6" fill="none" stroke="'+c2+'" stroke-width="1.5"/>'+
+      '<path d="M14 26 L11 38 L20 33 L29 38 L26 26 Z" fill="'+c1+'" stroke="'+c2+'" stroke-width="1.5"/>'+
+      '</svg>';
+  }
+  function fillHold(){
+    var rp=rankProgress(best);
+    document.getElementById('rankName').textContent=rp.name;
+    document.getElementById('rankBar').style.width=rp.pct+'%';
+    document.getElementById('rankNext').textContent =
+      rp.next ? ('до звания '+rp.next+': '+rp.need+' очков') : 'высшее звание достигнуто';
+    var html='';
+    for(var i=0;i<TROPHIES.length;i++){
+      var t=TROPHIES[i], on=false;
+      try{on=t.test();}catch(e){on=false;}
+      html+='<div class="trophy '+(on?'unlocked':'locked')+'">'+medalSVG(on)+
+            '<span class="tname">'+(on?t.name:'???')+'</span></div>';
+    }
+    document.getElementById('trophyGrid').innerHTML=html;
+  }
+  document.getElementById('showHold').onclick=function(){
+    fillHold(); menu.style.display='none'; hold.style.display='block';
+  };
+  document.getElementById('holdBack').onclick=function(){
+    hold.style.display='none'; menu.style.display='flex';
+  };
+  tgMusic.onclick=function(){ musicOn=!musicOn; paintToggle(tgMusic,musicOn);
+    try{localStorage.setItem('kunkka_music',musicOn?'1':'0');}catch(e){} applyAudio(); };
+  // выбор сложности в главном меню
+  (function(){ var bs=document.querySelectorAll('#menuDiff .diff');
+    for(var i=0;i<bs.length;i++){ bs[i].onclick=function(){
+      difficulty=this.getAttribute('data-diff'); paintDiff();
+    }; }
+    paintDiff();
+  })();
+
+  var paused=false;
+  function togglePause(){
+    if(countdown)return;        // во время отсчёта пауза недоступна
+    if(death)return;            // во время катсцены смерти пауза недоступна
+    if(!S.running && !paused)return; // игра не идёт (меню/таблица) — игнор
+    paused=!paused;S.running=!paused;
+    document.getElementById('pause').textContent=paused?'▶':'II';
+    document.getElementById('pauseOverlay').style.display=paused?'flex':'none';
+    if(paused){
+      bgm.pause();
+      try{ if(AC && AC.state==='running') AC.suspend(); }catch(e){}
+    } else {
+      bgm.play().catch(function(){});
+      try{ if(AC && AC.state==='suspended') AC.resume(); }catch(e){}   // вернуть звук
+      startLoop();
+    }
+  }
+  (function(){
+    var pb=document.getElementById('pause');
+    var touched=false;
+    // подавляем нативную подсветку касания (чёрный квадрат на Android-Chrome)
+    pb.addEventListener('touchstart',function(e){
+      e.preventDefault();           // не даём браузеру нарисовать highlight и сгенерить click
+      touched=true;
+      togglePause(); pb.blur();
+    }, {passive:false});
+    pb.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(touched){ touched=false; return; }  // тач уже обработан — пропускаем дубль
+      togglePause(); pb.blur();              // настоящий клик мышью (ПК)
+    });
+  })();
+  document.getElementById('pauseOverlay').onclick=function(){ togglePause(); };
+
+  // авто-пауза при сворачивании вкладки / блокировке телефона
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){
+      if(game.style.display!=='none' && !paused && !countdown && S.running){
+        togglePause();   // ставит паузу и сам приостанавливает звук
+      } else {
+        try{bgm.pause();}catch(e){}
+        try{ if(AC && AC.state==='running') AC.suspend(); }catch(e){}
+      }
+    } else {
+      // вернулись на вкладку. Если не в игре (меню/таблица) — вернём аудиоконтекст,
+      // иначе звук вернётся когда игрок снимет паузу.
+      if(!paused){
+        try{ if(AC && AC.state==='suspended') AC.resume(); }catch(e){}
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>
