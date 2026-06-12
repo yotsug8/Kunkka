@@ -352,6 +352,7 @@
       <button class="btn-ghost" id="showHold">Каюта</button>
       <button class="btn-ghost" id="showLb">Рекорды</button>
       <button class="btn-ghost" id="showSettings">Настройки</button>
+      <button class="btn-ghost" id="sourBtn" style="flex:0 0 100%;color:#7ee84a;border-color:#3a7020;background:rgba(10,30,8,.65);">Кислый Кунка</button>
     </div>
   </div>
 
@@ -728,6 +729,7 @@
   };
   var difficulty='normal';
   function dk(){return DIFF[difficulty]||DIFF.normal;}
+  var sourMode=false;
 
   // сколько нажатий нужно на зелёный — растёт с уровнем
   function greenHitsNeeded(){return Math.min(7, 2+Math.floor((S.level-1)/4)+dk().hits);}
@@ -796,6 +798,7 @@
   function hasRum(){for(var i=0;i<S.grapes.length;i++)if(S.grapes[i].rum)return true;return false;}
   function sourCount(){var n=0;for(var i=0;i<S.grapes.length;i++){var g=S.grapes[i];if(g.sour&&!g.gold&&!g.rum)n++;}return n;}
   function greenCount(){var n=0;for(var i=0;i<S.grapes.length;i++)if(!S.grapes[i].sour)n++;return n;}
+  function chokableCount(){if(sourMode){var n=0;for(var i=0;i<S.grapes.length;i++){var g=S.grapes[i];if(g.sour&&!g.gold&&!g.rum)n++;}return n;}return greenCount();}
   function hasGold(){for(var i=0;i<S.grapes.length;i++)if(S.grapes[i].gold)return true;return false;}
 
   function pointAt(px,py){
@@ -834,12 +837,13 @@
       }
       return null;
     }
-    if(g.sour){
+    var isDraggable=sourMode?(!g.sour&&!g.rum):g.sour;
+    if(isDraggable){
       g.held=true; g.x=clampX(px,g.r); g.y=clampY(py,g.r);
       return g;   // этот объект теперь тащится пальцем
     } else {
       g.hits++; g.squashT=120; SFX.squash();
-      burst(g.x,g.y,'#5fd83f',5);
+      burst(g.x,g.y,sourMode?'#c77bf0':'#5fd83f',5);
       if(g.hits>=greenHitsNeeded()){
         burst(g.x,g.y,'#7ee84a',10);
         STATS.green++; SESSION.green++;
@@ -858,6 +862,19 @@
     var d=Math.hypot(g.x-b.mouthX,g.y-b.mouthY);
     if(d < b.mouthR+g.r){
       S.face='happy'; S.faceT=600; S.mouthOpen=1;
+      if(sourMode){
+        if(!g.sour){
+          S.score+=10; STATS.purple++; SESSION.purple++;
+          SFX.eat(); burst(g.x,g.y,'#7ee84a',8);
+          if(Math.random()<0.15)say('eat');
+          floater(g.x,g.y,'+10','#7ee84a');
+          var nl=1+Math.floor(S.score/120);
+          SESSION.score=S.score;
+          if(nl!==S.level){levelUp(nl);SESSION.level=nl;}
+          removeGrape(g);upd();
+        }
+        g.held=false;return;
+      }
       if(g.rum){
         for(var ri=S.grapes.length-1;ri>=0;ri--){
           if(!S.grapes[ri].sour){ burst(S.grapes[ri].x,S.grapes[ri].y,'#7ee84a',8); S.grapes.splice(ri,1); }
@@ -1135,7 +1152,7 @@
 
   function update(dt){
     if(!S.running)return;
-    var gc=greenCount();
+    var gc=chokableCount();
     document.getElementById('gcount').textContent=gc;
 
     if(gc<4){
@@ -1185,12 +1202,13 @@
     // золото — редкое. Не появляется в горячий момент (зелёных 3+), чтобы не мешать
     S.goldT=(S.goldT||0)+dt;
     S.goldPity=(S.goldPity||0)+dt;
-    if(!hasGold() && gc<3){
+    if(!sourMode && !hasGold() && gc<3){
       if(S.goldPity>=35000){ spawnGold(); S.goldT=0; S.goldPity=0; }
       else if(S.goldT>3000){ S.goldT=0; if(Math.random()<0.16){ spawnGold(); S.goldPity=0; } }
     } else if(hasGold()){ S.goldPity=0; }
 
     // ром — бонус КУРАЖ (x2 очки). Появляется периодически, за ним охотишься.
+    if(!sourMode){
     if(S.rumCD>0) S.rumCD-=dt;
     if(hasRum()){
       S.rumT=0;
@@ -1203,6 +1221,7 @@
       if(S.rumT>=need){
         spawnRum(); S.rumT=0; S.rumCD=4000;   // короткий кулдаун — ром заметная часть игры
       }
+    }
     }
 
     for(var i=S.grapes.length-1;i>=0;i--){
@@ -1283,7 +1302,9 @@
     if(face.complete){
       ctx.fillStyle='#080604';
       ctx.fillRect(b.x,b.y,b.w,b.h);
+      if(sourMode)ctx.filter='hue-rotate(100deg) saturate(2)';
       ctx.drawImage(face, b.x, b.y+jitterY, b.w, b.h);
+      if(sourMode)ctx.filter='none';
     }
 
     // ---- рамка-портрет (медальон капитана) ----
@@ -1629,7 +1650,8 @@
       startLoop();
     }, 560);
   }
-  document.getElementById('play').onclick=start;
+  document.getElementById('play').onclick=function(){sourMode=false;start();};
+  document.getElementById('sourBtn').onclick=function(){sourMode=true;difficulty='normal';start();};
   document.getElementById('submitScore').onclick=function(){
     if(lastSubmitted)return;
     var name=lbClean(document.getElementById('pname').value);
@@ -1660,6 +1682,7 @@
     death=null;_deathAlive=false;
     over.style.display='none';game.style.display='none';bgm.pause();
     document.body.classList.remove('ingame');
+    sourMode=false;
     refreshMenuBest();
     menu.style.display='flex';setTimeout(function(){menu.style.opacity='1';},20);
   };
