@@ -352,7 +352,6 @@
       <button class="btn-ghost" id="showHold">Каюта</button>
       <button class="btn-ghost" id="showLb">Рекорды</button>
       <button class="btn-ghost" id="showSettings">Настройки</button>
-      <button class="btn-ghost" id="sourBtn" style="flex:0 0 100%;color:#7ee84a;border-color:#3a7020;background:rgba(10,30,8,.65);">Кислый Кунка</button>
     </div>
   </div>
 
@@ -1651,7 +1650,16 @@
     }, 560);
   }
   document.getElementById('play').onclick=function(){sourMode=false;start();};
-  document.getElementById('sourBtn').onclick=function(){sourMode=true;difficulty='normal';start();};
+  // пасхалка: 7 тапов по заголовку — Кислый Кунка
+  (function(){
+    var taps=0,tapT=0;
+    document.querySelector('#menu .title').addEventListener('click',function(){
+      var now=Date.now();
+      if(now-tapT>1400)taps=0;
+      tapT=now; taps++;
+      if(taps>=7){ taps=0; sourMode=true; difficulty='normal'; start(); }
+    });
+  })();
   document.getElementById('submitScore').onclick=function(){
     if(lastSubmitted)return;
     var name=lbClean(document.getElementById('pname').value);
