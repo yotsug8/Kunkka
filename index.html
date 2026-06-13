@@ -817,7 +817,7 @@
   }
   function hasRum(){for(var i=0;i<S.grapes.length;i++)if(S.grapes[i].rum)return true;return false;}
   function sourCount(){var n=0;for(var i=0;i<S.grapes.length;i++){var g=S.grapes[i];if(g.sour&&!g.gold&&!g.rum)n++;}return n;}
-  function greenCount(){var n=0;for(var i=0;i<S.grapes.length;i++)if(!S.grapes[i].sour)n++;return n;}
+  function greenCount(){var n=0;for(var i=0;i<S.grapes.length;i++){var g=S.grapes[i];if(!g.sour&&!g.gold&&!g.rum)n++;}return n;}
   function chokableCount(){if(sourMode){var n=0;for(var i=0;i<S.grapes.length;i++){var g=S.grapes[i];if(g.sour&&!g.gold&&!g.rum)n++;}return n;}return greenCount();}
   function hasGold(){for(var i=0;i<S.grapes.length;i++)if(S.grapes[i].gold)return true;return false;}
 
@@ -1207,13 +1207,12 @@
         greenChance=Math.min(0.82, greenChance + (S.greenDry||0)*0.12);
         var grace=(S.rumGrace||0)>0;
         var greenKillGrace=(S.greenKillCD||0)>0;
-        var rumOnScreen=hasRum();
-        var rollGreen=Math.random()<greenChance && !grace && !greenKillGrace && !(rumOnScreen&&gc>=3);
+        var rollGreen=Math.random()<greenChance && !grace && !greenKillGrace;
         if(rollGreen){
           spawn('green'); S.greenDry=0;
         } else if(sc<sourCap){
           spawn('sour'); S.greenDry=(S.greenDry||0)+1;
-        } else if(!grace && !greenKillGrace && !(rumOnScreen&&gc>=3)){
+        } else if(!grace && !greenKillGrace){
           spawn('green'); S.greenDry=0;
         }
       }
@@ -1739,8 +1738,6 @@
       cx.strokeRect(10,10,W-20,H-20);
       cx.strokeStyle='rgba(199,155,66,0.22)'; cx.lineWidth=1;
       cx.strokeRect(16,16,W-32,H-32);
-      // grape corner badge
-      if(gi){ cx.drawImage(gi, W-72, 14, 56, 56); }
       // title
       cx.textAlign='center';
       cx.fillStyle='#c79b42';
