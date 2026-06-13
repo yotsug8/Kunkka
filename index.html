@@ -1714,62 +1714,74 @@
     lbSubmit(name,myScore,function(ok){
       if(!ok){ btn.disabled=false; btn.textContent='Ошибка — ещё раз'; return; }
       lastSubmitted=true;
-      btn.textContent='Записано!';
-      setTimeout(function(){ document.getElementById('submitBox').style.display='none'; },800);
+      document.getElementById('submitBox').style.display='none';
+      document.getElementById('boardRows').innerHTML='<div class="bload">обновляем…</div>';
+      lbLoad(function(arr){ renderBoard(arr,name,myScore); });
     });
   };
   var _shareData=null;
   function _buildShareCanvas(data,cb){
-    var W=540,H=320,dpr=2;
-    var sc=document.createElement('canvas');
-    sc.width=W*dpr; sc.height=H*dpr;
-    var cx=sc.getContext('2d');
+    var W=540,H=340,dpr=2;
+    var cv2=document.createElement('canvas');
+    cv2.width=W*dpr; cv2.height=H*dpr;
+    var cx=cv2.getContext('2d');
     cx.scale(dpr,dpr);
-    // background
-    cx.fillStyle='#160c04'; cx.fillRect(0,0,W,H);
-    // border
-    cx.strokeStyle='#c79b42'; cx.lineWidth=3;
-    cx.strokeRect(10,10,W-20,H-20);
-    // inner glow line
-    cx.strokeStyle='rgba(199,155,66,0.25)'; cx.lineWidth=1;
-    cx.strokeRect(16,16,W-32,H-32);
-    // title
-    cx.textAlign='center';
-    cx.fillStyle='#c79b42';
-    cx.font='bold 32px Georgia,serif';
-    cx.fillText('КУНКА', W/2, 58);
-    cx.fillStyle='#8a6020';
-    cx.font='13px Georgia,serif';
-    var modeStr=data.mode==='hard'?' · ХАРДКОР':'';
-    cx.fillText('Виноградный Шторм'+modeStr, W/2, 78);
-    // divider
-    cx.strokeStyle='#c79b42'; cx.lineWidth=1;
-    cx.beginPath(); cx.moveTo(50,92); cx.lineTo(W-50,92); cx.stroke();
-    // score
-    cx.fillStyle='#ffffff';
-    cx.font='bold 72px Georgia,serif';
-    cx.fillText(String(data.score), W/2, 175);
-    cx.fillStyle='#7a5a20';
-    cx.font='14px Georgia,serif';
-    cx.fillText('ОЧКИ', W/2, 195);
-    // rank
-    cx.fillStyle='#ffd24a';
-    cx.font='bold 22px Georgia,serif';
-    cx.fillText(data.rank, W/2, 228);
-    // stats
-    cx.fillStyle='#a07840';
-    cx.font='14px Georgia,serif';
-    var stats='⚡ Уровень '+data.level+'   🍇 '+data.purple;
-    if(data.gold) stats+='   🌟 '+data.gold;
-    cx.fillText(stats, W/2, 254);
-    // divider
-    cx.strokeStyle='rgba(199,155,66,0.4)'; cx.lineWidth=1;
-    cx.beginPath(); cx.moveTo(50,270); cx.lineTo(W-50,270); cx.stroke();
-    // url
-    cx.fillStyle='#7a6030';
-    cx.font='12px monospace';
-    cx.fillText('yotsug8.github.io/Kunkka', W/2, 292);
-    sc.toBlob(cb,'image/png');
+    function drawCard(gi){
+      cx.fillStyle='#160c04'; cx.fillRect(0,0,W,H);
+      // grape watermark behind score
+      if(gi){
+        cx.save(); cx.globalAlpha=0.09;
+        cx.drawImage(gi, W/2-110, H/2-110, 220, 220);
+        cx.restore();
+      }
+      // borders
+      cx.strokeStyle='#c79b42'; cx.lineWidth=3;
+      cx.strokeRect(10,10,W-20,H-20);
+      cx.strokeStyle='rgba(199,155,66,0.22)'; cx.lineWidth=1;
+      cx.strokeRect(16,16,W-32,H-32);
+      // grape corner badge
+      if(gi){ cx.drawImage(gi, W-72, 14, 56, 56); }
+      // title
+      cx.textAlign='center';
+      cx.fillStyle='#c79b42';
+      cx.font='bold 34px Georgia,serif';
+      cx.fillText('КУНКА', W/2, 58);
+      cx.fillStyle='#7a5520';
+      cx.font='13px Georgia,serif';
+      cx.fillText('Виноградный Шторм'+(data.mode==='hard'?' · ХАРДКОР':''), W/2, 78);
+      // top divider
+      cx.strokeStyle='rgba(199,155,66,0.6)'; cx.lineWidth=1;
+      cx.beginPath(); cx.moveTo(50,94); cx.lineTo(W-50,94); cx.stroke();
+      // score
+      cx.fillStyle='#ffffff';
+      cx.font='bold 76px Georgia,serif';
+      cx.fillText(String(data.score), W/2, 186);
+      cx.fillStyle='#6a4a10';
+      cx.font='bold 12px Georgia,serif';
+      cx.fillText('О Ч К И', W/2, 206);
+      // rank
+      cx.fillStyle='#ffd24a';
+      cx.font='bold 26px Georgia,serif';
+      cx.fillText(data.rank, W/2, 244);
+      // stats
+      cx.fillStyle='#9a7030';
+      cx.font='15px Georgia,serif';
+      var st='⚡ Уровень '+data.level+'   🍇 '+data.purple;
+      if(data.gold) st+='   🌟 '+data.gold;
+      cx.fillText(st, W/2, 272);
+      // bottom divider
+      cx.strokeStyle='rgba(199,155,66,0.35)'; cx.lineWidth=1;
+      cx.beginPath(); cx.moveTo(60,290); cx.lineTo(W-60,290); cx.stroke();
+      // url
+      cx.fillStyle='#6a5520';
+      cx.font='12px monospace';
+      cx.fillText('yotsug8.github.io/Kunkka', W/2, 314);
+      cv2.toBlob(cb,'image/png');
+    }
+    var img=new Image();
+    img.onload=function(){ drawCard(img); };
+    img.onerror=function(){ drawCard(null); };
+    img.src='./grapes.png';
   }
   function _shareTextFallback(data){
     var mode=data.mode==='hard'?' (Хардкор)':'';
