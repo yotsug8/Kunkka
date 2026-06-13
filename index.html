@@ -370,6 +370,7 @@
       <button class="btn-ghost" id="showLb">Рекорды</button>
       <button class="btn-ghost" id="showSettings">Настройки</button>
     </div>
+    <button id="installBtn" style="display:none;margin-top:14px;background:none;border:none;color:#a08050;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;cursor:pointer;opacity:0.7;padding:4px 8px;">↓ Установить приложение</button>
   </div>
 
   <div id="howto" class="wood-bg">
@@ -1876,6 +1877,24 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js').catch(function(){});
   });
 }
+(function(){
+  var _prompt=null;
+  var btn=document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt',function(e){
+    e.preventDefault();
+    _prompt=e;
+    if(btn)btn.style.display='block';
+  });
+  window.addEventListener('appinstalled',function(){
+    _prompt=null;
+    if(btn)btn.style.display='none';
+  });
+  if(btn)btn.addEventListener('click',function(){
+    if(!_prompt)return;
+    _prompt.prompt();
+    _prompt.userChoice.then(function(){_prompt=null;btn.style.display='none';});
+  });
+})();
 </script>
 </body>
 </html>
