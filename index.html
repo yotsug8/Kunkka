@@ -72,6 +72,7 @@
 
 
 
+
   /* ---- канат-разделитель (SVG, чёткие линии) ---- */
   .rope{width:82%;max-width:330px;margin:20px auto;display:block;
     filter:drop-shadow(0 3px 5px rgba(0,0,0,.7));}
@@ -1212,7 +1213,7 @@
       // зелёных меньше 4 — угроза ещё не набралась
       S.greenFull=0;
       S.spawnT+=dt;
-      if(S.spawnT>S.spawnGap && S.grapes.length<8){
+      if(S.spawnT>S.spawnGap && S.grapes.length-((hasRum()?1:0)+(hasGold()?1:0))<8){
         S.spawnT=0;
         var sourCap=4;
         var sc=sourCount();

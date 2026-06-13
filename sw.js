@@ -1,4 +1,4 @@
-const CACHE = 'kunkka-v6';
+const CACHE = 'kunkka-v7';
 const ASSETS = [
   './',
   './manifest.json',
