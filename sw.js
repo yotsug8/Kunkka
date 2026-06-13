@@ -1,7 +1,9 @@
-const CACHE = 'kunkka-v3';
+const CACHE = 'kunkka-v4';
 const ASSETS = [
   './',
   './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
   './favicon.png',
   './favicon.ico',
   './kunka.png',
