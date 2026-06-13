@@ -854,8 +854,8 @@
       g.hits++; g.squashT=120; SFX.squash();
       burst(g.x,g.y,sourMode?'#c77bf0':'#5fd83f',5);
       if(g.hits>=greenHitsNeeded()){
-        burst(g.x,g.y,'#7ee84a',10);
-        STATS.green++; SESSION.green++;
+        burst(g.x,g.y,sourMode?'#c77bf0':'#7ee84a',10);
+        if(!sourMode){ STATS.green++; SESSION.green++; }
         if(Math.random()<0.2) say('squash');
         removeGrape(g);
       }
