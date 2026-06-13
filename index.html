@@ -317,38 +317,6 @@
   #trophyToast .tt-medal{width:34px;height:34px;flex:none;}
   #trophyToast .tt-title{font-family:"Cinzel",serif;font-size:10px;letter-spacing:2px;color:#cdae74;text-transform:uppercase;}
   #trophyToast .tt-name{font-family:"Cinzel",serif;font-size:15px;font-weight:700;color:var(--gold);}
-
-  /* ===== CAMPAIGN ===== */
-  #campHub,#campShop,#campResult{
-    position:fixed;inset:0;z-index:40;display:none;flex-direction:column;
-    align-items:center;justify-content:flex-start;
-    padding:28px 20px 20px;overflow-y:auto;}
-  .camp-title{font-family:"Cinzel Decorative",serif;font-weight:900;
-    font-size:clamp(16px,5.5vw,26px);color:var(--gold);letter-spacing:2px;
-    text-align:center;text-shadow:0 2px 0 #3a2710,0 3px 6px rgba(0,0,0,.7);margin-bottom:6px;}
-  .camp-dbl{font-family:"Cinzel",serif;font-size:13px;color:#f0d060;
-    letter-spacing:1px;margin-bottom:10px;font-weight:700;text-align:center;}
-  #campMapSvg{width:100%;max-width:360px;border:1.5px solid rgba(200,160,60,.28);
-    border-radius:6px;margin:6px 0;touch-action:manipulation;}
-  .camp-island-panel{text-align:center;margin:8px 0;min-height:44px;}
-  .camp-isl-name{font-family:"Cinzel",serif;font-size:15px;color:var(--gold);font-weight:700;}
-  .camp-isl-sub{font-size:11px;color:#b09070;margin-top:3px;letter-spacing:.5px;}
-  .camp-actions{display:flex;flex-direction:column;align-items:center;gap:8px;
-    margin-top:10px;width:100%;max-width:300px;}
-  .upg-list{width:100%;max-width:340px;display:flex;flex-direction:column;
-    gap:10px;margin:10px 0;}
-  .upg-card{background:rgba(0,0,0,.38);border:1px solid rgba(200,160,60,.22);
-    border-radius:6px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
-  .upg-info{flex:1;}
-  .upg-name{font-family:"Cinzel",serif;font-size:13px;color:var(--gold);font-weight:700;}
-  .upg-desc{font-size:11px;color:#a08060;margin-top:2px;letter-spacing:.4px;}
-  .upg-lvl{font-size:11px;color:#c79b42;margin-top:4px;}
-  .upg-buy{font-family:"Cinzel",serif;font-size:11px;letter-spacing:1px;font-weight:700;
-    background:linear-gradient(180deg,#c79b42,#8a6a20);border:1.5px solid #4a3410;
-    color:#1f1206;padding:7px 13px;cursor:pointer;border-radius:2px;min-width:72px;text-align:center;}
-  .upg-buy:disabled{opacity:.35;cursor:default;}
-  .camp-res-box{background:rgba(0,0,0,.48);border:1.5px solid rgba(200,160,60,.38);
-    border-radius:8px;padding:20px 24px;text-align:center;margin:12px 0;width:100%;max-width:300px;}
 </style>
 </head>
 <body>
@@ -401,7 +369,6 @@
       <button class="btn-ghost" id="showLb">Рекорды</button>
       <button class="btn-ghost" id="showSettings">Настройки</button>
     </div>
-    <button class="btn-ghost" id="campBtn" style="margin-top:10px;width:100%;max-width:calc(100% - 0px);letter-spacing:3px;">⚓ Карьера капитана</button>
     <button id="installBtn" style="display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:none;border:none;color:#7a6040;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;cursor:pointer;opacity:0.55;padding:6px 12px;white-space:nowrap;">↓ Установить</button>
   </div>
 
@@ -458,39 +425,6 @@
       <div class="credit">Создано Admiral8Dota</div>
     </div>
   </div>
-
-  <!-- ===== CAMPAIGN SCREENS ===== -->
-  <div id="campHub" class="wood-bg">
-    <div class="camp-title">Карьера Капитана</div>
-    <div class="camp-dbl" id="campDblTxt">🪙 0 дублонов · Рейсов: 0</div>
-    <svg id="campMapSvg" viewBox="0 0 320 210" xmlns="http://www.w3.org/2000/svg"></svg>
-    <div class="camp-island-panel">
-      <div class="camp-isl-name" id="campSelName">Выберите курс</div>
-      <div class="camp-isl-sub" id="campSelSub">Нажмите на остров на карте</div>
-    </div>
-    <div class="camp-actions">
-      <button class="btn" id="campSailBtn" style="display:none">⚓ Выйти в море</button>
-      <button class="btn-ghost" id="campShopBtn">🔧 Верфь</button>
-      <button class="btn-ghost" id="campBackBtn">← Главное меню</button>
-    </div>
-  </div>
-
-  <div id="campShop" class="wood-bg">
-    <div class="camp-title">Верфь</div>
-    <div class="camp-dbl" id="campShopDbl">🪙 0 дублонов</div>
-    <div class="upg-list" id="upgList"></div>
-    <button class="btn-ghost" id="campShopBack" style="margin-top:8px">← Карта</button>
-  </div>
-
-  <div id="campResult" class="wood-bg">
-    <div class="camp-title">Рейс завершён</div>
-    <div class="camp-res-box" id="campResBox"></div>
-    <div class="camp-actions">
-      <button class="btn" id="campRetryBtn">↺ Повторить рейс</button>
-      <button class="btn-ghost" id="campToHubBtn">⚓ В порт</button>
-    </div>
-  </div>
-  <!-- ===== END CAMPAIGN SCREENS ===== -->
 
   <div id="game">
     <canvas id="cv"></canvas>
@@ -727,12 +661,6 @@
        drag:null,last:0,shake:0,flash:0,wasFull:false,mouthOpen:0,face:'idle',faceT:0,running:true,floaters:[],
        particles:[],distress:0,goldT:0,rumT:0,goldPity:0,rumPity:0,rumGrace:0,rumCD:0,greenDry:0,kurazh:0,banner:null,bubble:null,_sayT:0};
     warnSndT=0;
-    // Campaign start bonus (Попутный ветер upgrade)
-    if(campaignMode&&CAMP_DATA&&(CAMP_DATA.upgrades.start||0)>0){
-      var bonus=(CAMP_DATA.upgrades.start||0)*60;
-      S.score=bonus; SESSION.score=bonus;
-      var nl=1+Math.floor(bonus/120); if(nl>1){S.level=nl;SESSION.level=nl;}
-    }
     upd();
   }
   var _lastScore=0;
@@ -974,7 +902,7 @@
         S.score+=20; STATS.rum++; SESSION.rum++;
         SFX.rum(); burst(g.x,g.y,'#d8a04a',24); say('rum');
         S.flash=0; S.wasFull=false; S.greenFull=0;
-        S.rumGrace=2000+(campaignMode&&CAMP_DATA?(CAMP_DATA.upgrades.barrel||0)*4000:0);
+        S.rumGrace=2000;
         S.kurazh=6000;   // 6 секунд КУРАЖА — очки x2
         banner('КУРАЖ ×2','#ffd24a',1600);
         removeGrape(g); upd(); g.held=false; return;
@@ -1178,8 +1106,6 @@
         game.style.display='none'; document.body.classList.remove('ingame');
         refreshMenuBest();
         menu.style.display='flex'; setTimeout(function(){ menu.style.opacity='1'; },20);
-      } else if(campaignMode){
-        showCampResult(S.score);
       } else {
         showOverScreen();
       }
@@ -1316,7 +1242,7 @@
     S.goldPity=(S.goldPity||0)+dt;
     if(!sourMode && !hasGold() && gc<3){
       if(S.goldPity>=35000){ spawnGold(); S.goldT=0; S.goldPity=0; }
-      else if(S.goldT>3000){ S.goldT=0; var _gc=0.16+(campaignMode&&CAMP_DATA?(CAMP_DATA.upgrades.nose||0)*0.08:0); if(Math.random()<_gc){ spawnGold(); S.goldPity=0; } }
+      else if(S.goldT>3000){ S.goldT=0; if(Math.random()<0.16){ spawnGold(); S.goldPity=0; } }
     } else if(hasGold()){ S.goldPity=0; }
 
     // ром — бонус КУРАЖ (x2 очки). Появляется периодически, за ним охотишься.
@@ -1805,7 +1731,7 @@
     death=null;_deathAlive=false;
     over.style.display='none';game.style.display='none';bgm.pause();
     document.body.classList.remove('ingame');
-    sourMode=false;campaignMode=false;
+    sourMode=false;
     refreshMenuBest();
     menu.style.display='flex';setTimeout(function(){menu.style.opacity='1';},20);
   };
@@ -1943,257 +1869,6 @@
     }
   });
 })();
-</script>
-<script>
-// ===== CAMPAIGN SYSTEM =====
-var campaignMode=false;
-var campSailTarget=null;
-var campSelIsland=null;
-
-var CAMP_ISLANDS=[
-  {id:'tortuga',  name:'Тортуга',        x:55,  y:105, mult:1.0, diff:'normal', desc:'Ваш дом. Спокойные воды.'},
-  {id:'havana',   name:'Гавана',          x:155, y:42,  mult:1.4, diff:'normal', desc:'Торговый порт. Неплохой доход.'},
-  {id:'portroyal',name:'Порт-Ройяль',    x:248, y:115, mult:2.0, diff:'hard',   desc:'Британский гарнизон. Опасно, выгодно.'},
-  {id:'maracaibo',name:'Маракайбо',      x:142, y:168, mult:2.5, diff:'hard',   desc:'Шторма и пираты. Только для смелых.'},
-  {id:'treasure', name:'Остров Сокровищ',x:286, y:48,  mult:4.0, diff:'hard',   desc:'Легендарный клад. Требует опыта.'}
-];
-var CAMP_ROUTES=[
-  ['tortuga','havana'],['tortuga','maracaibo'],
-  ['havana','portroyal'],['maracaibo','portroyal'],
-  ['portroyal','treasure']
-];
-var CAMP_UPG_DEF=[
-  {id:'nose',  icon:'🔭',name:'Зоркий глаз',     desc:'+25% шанс золотого',   maxLvl:3,costs:[80,220,550]},
-  {id:'barrel',icon:'🥃',name:'Большой бочонок', desc:'Ром длится +4 сек',    maxLvl:3,costs:[70,190,470]},
-  {id:'luck',  icon:'🍀',name:'Удача моряка',     desc:'+25% дублонов с рейса',maxLvl:3,costs:[100,270,650]},
-  {id:'start', icon:'⚡',name:'Попутный ветер',   desc:'Старт: +60 очков',     maxLvl:3,costs:[90,250,620]}
-];
-var CAMP_DEF={doubloons:0,currentIsland:'tortuga',visited:{tortuga:true},voyages:0,upgrades:{nose:0,barrel:0,luck:0,start:0}};
-var CAMP_DATA=null;
-
-function campLoad(){
-  CAMP_DATA=JSON.parse(JSON.stringify(CAMP_DEF));
-  try{var s=localStorage.getItem('kunkka_campaign');if(s){var p=JSON.parse(s);CAMP_DATA=p;
-    if(!CAMP_DATA.upgrades)CAMP_DATA.upgrades={nose:0,barrel:0,luck:0,start:0};
-    if(!CAMP_DATA.visited)CAMP_DATA.visited={tortuga:true};}}catch(e){}
-}
-function campSave(){try{localStorage.setItem('kunkka_campaign',JSON.stringify(CAMP_DATA));}catch(e){}}
-function campGetIsland(id){for(var i=0;i<CAMP_ISLANDS.length;i++)if(CAMP_ISLANDS[i].id===id)return CAMP_ISLANDS[i];return CAMP_ISLANDS[0];}
-function campNeighbors(id){var n=[];for(var i=0;i<CAMP_ROUTES.length;i++){var r=CAMP_ROUTES[i];if(r[0]===id)n.push(r[1]);if(r[1]===id)n.push(r[0]);}return n;}
-function campUnlocked(id){
-  if(id==='treasure')return!!(CAMP_DATA.visited.tortuga&&CAMP_DATA.visited.havana&&CAMP_DATA.visited.portroyal&&CAMP_DATA.visited.maracaibo);
-  return true;
-}
-function campEarn(score){
-  var isl=campGetIsland(campSailTarget||CAMP_DATA.currentIsland);
-  var luck=1+(CAMP_DATA.upgrades.luck||0)*0.25;
-  return Math.floor(score*isl.mult*luck);
-}
-
-function campRenderMap(){
-  var svg=document.getElementById('campMapSvg');
-  if(!svg)return;
-  var cur=CAMP_DATA.currentIsland;
-  var nbrs=campNeighbors(cur);
-  var h='';
-  // Sea
-  h+='<defs><radialGradient id="sg" cx="50%" cy="50%" r="65%"><stop offset="0%" stop-color="#0e3860" stop-opacity=".55"/><stop offset="100%" stop-color="#040e1c" stop-opacity=".35"/></radialGradient></defs>';
-  h+='<rect width="320" height="210" fill="#071828" rx="5"/><rect width="320" height="210" fill="url(#sg)" rx="5"/>';
-  // Wave dots
-  var wv=[[38,80],[95,140],[158,55],[210,95],[268,148],[288,72],[108,28],[230,175],[70,170],[175,118]];
-  h+='<g opacity=".1">';
-  for(var i=0;i<wv.length;i++)h+='<ellipse cx="'+wv[i][0]+'" cy="'+wv[i][1]+'" rx="16" ry="4" fill="#5ab0e0"/>';
-  h+='</g>';
-  // Routes
-  for(var i=0;i<CAMP_ROUTES.length;i++){
-    var r=CAMP_ROUTES[i];
-    var a=campGetIsland(r[0]),b=campGetIsland(r[1]);
-    var isNbr=(r[0]===cur&&nbrs.indexOf(r[1])>=0)||(r[1]===cur&&nbrs.indexOf(r[0])>=0);
-    h+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="'+(isNbr?'#c79b42':'#3a5060')+'" stroke-width="1.4" stroke-dasharray="'+(isNbr?'5,4':'3,6')+'" opacity="'+(isNbr?'.55':'.25')+'"/>';
-  }
-  // Islands
-  for(var i=0;i<CAMP_ISLANDS.length;i++){
-    var isl=CAMP_ISLANDS[i];
-    var isCur=(isl.id===cur);
-    var isNbr=(nbrs.indexOf(isl.id)>=0);
-    var isSel=(campSelIsland===isl.id);
-    var isVis=!!(CAMP_DATA.visited[isl.id]);
-    var isUnlk=campUnlocked(isl.id);
-    var col=isCur?'#f0c840':isSel?'#d4a820':isVis?'#7aa060':(isNbr&&isUnlk)?'#b09040':'#384858';
-    var rad=isCur?11:(isNbr&&isUnlk)?10:8;
-    var txtCol=isCur?'#f0d060':(isNbr&&isUnlk)?'#c8a840':isVis?'#8a9a70':'#50666a';
-    if(!isUnlk){col='#263040';txtCol='#384858';}
-    // Glow for current
-    if(isCur)h+='<circle cx="'+isl.x+'" cy="'+isl.y+'" r="18" fill="#c79b42" opacity=".12"/>';
-    if(isSel&&!isCur)h+='<circle cx="'+isl.x+'" cy="'+isl.y+'" r="15" fill="#c79b42" opacity=".10"/>';
-    h+='<circle class="camp-isle" data-id="'+isl.id+'" cx="'+isl.x+'" cy="'+isl.y+'" r="'+rad+'" fill="'+col+'" stroke="'+(isCur?'#c79b42':isSel?'#e0b030':'rgba(0,0,0,.5')+'" stroke-width="'+(isCur?2.5:1.5)+'" style="cursor:pointer"/>';
-    if(isCur)h+='<text x="'+isl.x+'" y="'+(isl.y-15)+'" text-anchor="middle" font-size="11" fill="#f0d060">⚓</text>';
-    if(!isUnlk)h+='<text x="'+isl.x+'" y="'+(isl.y+3)+'" text-anchor="middle" font-size="9" fill="#506070">🔒</text>';
-    var ty=(isl.y>155)?isl.y-rad-5:isl.y+rad+11;
-    h+='<text x="'+isl.x+'" y="'+ty+'" text-anchor="middle" font-size="8.5" fill="'+txtCol+'" font-family="Cinzel,serif" font-weight="600">'+isl.name+'</text>';
-  }
-  svg.innerHTML=h;
-  // Click handlers
-  var circles=svg.querySelectorAll('.camp-isle');
-  for(var i=0;i<circles.length;i++){
-    (function(c){c.addEventListener('click',function(){campClickIsland(this.getAttribute('data-id'));});})(circles[i]);
-  }
-}
-
-function campClickIsland(id){
-  if(!CAMP_DATA)return;
-  campSelIsland=id;
-  campRenderMap();
-  var isl=campGetIsland(id);
-  var cur=CAMP_DATA.currentIsland;
-  var nbrs=campNeighbors(cur);
-  var isNbr=nbrs.indexOf(id)>=0;
-  var isUnlk=campUnlocked(id);
-  var nm=document.getElementById('campSelName');
-  var sb=document.getElementById('campSelSub');
-  var sailBtn=document.getElementById('campSailBtn');
-  if(nm)nm.textContent=isl.name;
-  if(sb){
-    if(id===cur)sb.textContent='Вы здесь · '+isl.desc;
-    else if(!isUnlk)sb.textContent='🔒 Сначала посетите все 4 острова';
-    else if(!isNbr)sb.textContent='Нет прямого маршрута';
-    else sb.textContent='×'+isl.mult.toFixed(1)+' дублонов · '+(isl.diff==='hard'?'Хардкор':'Обычная');
-  }
-  if(sailBtn)sailBtn.style.display=(id!==cur&&isNbr&&isUnlk)?'block':'none';
-  if(sailBtn&&id!==cur&&isNbr&&isUnlk)sailBtn.textContent='⚓ Плыть в '+isl.name;
-}
-
-function showCampHub(){
-  if(!CAMP_DATA)campLoad();
-  campSelIsland=null;
-  document.getElementById('campHub').style.display='flex';
-  var dbl=document.getElementById('campDblTxt');
-  if(dbl)dbl.textContent='🪙 '+CAMP_DATA.doubloons+' дублонов · Рейсов: '+CAMP_DATA.voyages;
-  var nm=document.getElementById('campSelName');
-  var sb=document.getElementById('campSelSub');
-  var sailBtn=document.getElementById('campSailBtn');
-  if(nm)nm.textContent='Выберите курс';
-  if(sb)sb.textContent='Нажмите на остров на карте';
-  if(sailBtn)sailBtn.style.display='none';
-  campRenderMap();
-}
-function hideCampHub(){document.getElementById('campHub').style.display='none';}
-
-function showCampShop(){
-  if(!CAMP_DATA)campLoad();
-  hideCampHub();
-  document.getElementById('campShop').style.display='flex';
-  var dbl=document.getElementById('campShopDbl');
-  if(dbl)dbl.textContent='🪙 '+CAMP_DATA.doubloons+' дублонов';
-  var list=document.getElementById('upgList');
-  if(!list)return;
-  list.innerHTML='';
-  for(var i=0;i<CAMP_UPG_DEF.length;i++){
-    var u=CAMP_UPG_DEF[i];
-    var lvl=CAMP_DATA.upgrades[u.id]||0;
-    var maxed=(lvl>=u.maxLvl);
-    var cost=maxed?0:u.costs[lvl];
-    var can=!maxed&&CAMP_DATA.doubloons>=cost;
-    var dots='';
-    for(var j=0;j<u.maxLvl;j++)dots+='<span style="color:'+(j<lvl?'#c79b42':'#404040')+'">●</span> ';
-    var card=document.createElement('div');
-    card.className='upg-card';
-    card.innerHTML='<div class="upg-info"><div class="upg-name">'+u.icon+' '+u.name+'</div>'+
-      '<div class="upg-desc">'+u.desc+'</div>'+
-      '<div class="upg-lvl">'+dots+(maxed?'— Максимум':'— '+cost+' 🪙')+'</div></div>'+
-      '<button class="upg-buy" data-uid="'+u.id+'" '+(maxed||!can?'disabled':'')+'>'+
-      (maxed?'✓':'Купить')+'</button>';
-    list.appendChild(card);
-  }
-  var btns=list.querySelectorAll('.upg-buy');
-  for(var i=0;i<btns.length;i++){
-    btns[i].addEventListener('click',function(){campBuyUpgrade(this.getAttribute('data-uid'));});
-  }
-}
-function hideCampShop(){document.getElementById('campShop').style.display='none';}
-
-function campBuyUpgrade(uid){
-  var uDef=null;
-  for(var i=0;i<CAMP_UPG_DEF.length;i++)if(CAMP_UPG_DEF[i].id===uid){uDef=CAMP_UPG_DEF[i];break;}
-  if(!uDef)return;
-  var lvl=CAMP_DATA.upgrades[uid]||0;
-  if(lvl>=uDef.maxLvl)return;
-  var cost=uDef.costs[lvl];
-  if(CAMP_DATA.doubloons<cost)return;
-  CAMP_DATA.doubloons-=cost;
-  CAMP_DATA.upgrades[uid]=lvl+1;
-  campSave();
-  showCampShop();
-}
-
-function campStartVoyage(islandId){
-  if(!CAMP_DATA)campLoad();
-  campSailTarget=islandId;
-  campaignMode=true;
-  var isl=campGetIsland(islandId);
-  difficulty=isl.diff;
-  sourMode=false;
-  hideCampHub();
-  hideCampShop();
-  start();
-}
-
-function showCampResult(score){
-  if(!CAMP_DATA)campLoad();
-  var islandId=campSailTarget||CAMP_DATA.currentIsland;
-  var isl=campGetIsland(islandId);
-  var earned=campEarn(score);
-  CAMP_DATA.doubloons+=earned;
-  CAMP_DATA.voyages++;
-  if(!CAMP_DATA.visited)CAMP_DATA.visited={};
-  CAMP_DATA.visited[islandId]=true;
-  CAMP_DATA.currentIsland=islandId;
-  campSave();
-  campaignMode=false;
-
-  var box=document.getElementById('campResBox');
-  if(box){
-    var treasureMsg='';
-    if(CAMP_DATA.visited.tortuga&&CAMP_DATA.visited.havana&&CAMP_DATA.visited.portroyal&&CAMP_DATA.visited.maracaibo&&!CAMP_DATA.visited.treasure){
-      treasureMsg='<div style="margin-top:10px;font-size:11px;color:#f0d060;letter-spacing:.5px">🗝 Открыт Остров Сокровищ!</div>';
-    }
-    box.innerHTML=
-      '<div style="font-family:Cinzel,serif;font-size:13px;color:#b09070;letter-spacing:1px;margin-bottom:10px">⚓ '+isl.name+'</div>'+
-      '<div style="font-size:13px;color:#d0b080;margin-bottom:4px">Счёт: <b>'+score+'</b></div>'+
-      '<div style="font-size:13px;color:#d0b080;margin-bottom:10px">Множитель: ×'+isl.mult.toFixed(1)+'</div>'+
-      '<div style="font-size:26px;font-weight:900;color:#f0d060;margin:6px 0">+'+earned+' 🪙</div>'+
-      '<div style="font-size:12px;color:#a09070;margin-top:4px">Всего: '+CAMP_DATA.doubloons+' дублонов</div>'+
-      treasureMsg;
-  }
-  game.style.display='none';
-  document.body.classList.remove('ingame');
-  bgm.pause();
-  document.getElementById('campResult').style.display='flex';
-}
-function hideCampResult(){document.getElementById('campResult').style.display='none';}
-
-// Campaign button handlers
-document.getElementById('campBtn').addEventListener('click',function(){
-  menu.style.opacity='0';
-  setTimeout(function(){menu.style.display='none';showCampHub();},400);
-});
-document.getElementById('campBackBtn').addEventListener('click',function(){
-  hideCampHub();
-  menu.style.display='flex';setTimeout(function(){menu.style.opacity='1';},20);
-});
-document.getElementById('campShopBtn').addEventListener('click',function(){showCampShop();});
-document.getElementById('campShopBack').addEventListener('click',function(){hideCampShop();showCampHub();});
-document.getElementById('campSailBtn').addEventListener('click',function(){
-  if(campSelIsland&&campSelIsland!==CAMP_DATA.currentIsland)campStartVoyage(campSelIsland);
-});
-document.getElementById('campRetryBtn').addEventListener('click',function(){
-  hideCampResult();
-  if(campSailTarget)campStartVoyage(campSailTarget);
-});
-document.getElementById('campToHubBtn').addEventListener('click',function(){
-  hideCampResult();
-  showCampHub();
-});
 </script>
 <script>
 if('serviceWorker' in navigator){
