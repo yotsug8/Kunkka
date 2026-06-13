@@ -1136,9 +1136,7 @@
     document.getElementById('submitBox').style.display='flex';
     document.getElementById('submitScore').disabled=false;
     document.getElementById('submitScore').textContent='Записать рекорд';
-    document.getElementById('boardRows').innerHTML='<div class="bload">загрузка…</div>';
-    setBoardTitle();
-    lbLoad(function(arr){ renderBoard(arr,null,null); });
+    document.getElementById('board').style.display='none';
     over.style.display='flex';
     game.style.display='none';
   }
@@ -1152,6 +1150,7 @@
       document.getElementById('submitBox').style.display='none';
       document.getElementById('again').style.display='none';
     }catch(e){}
+    document.getElementById('board').style.display='';
     document.getElementById('boardRows').innerHTML='<div class="bload">загрузка…</div>';
     try{ setBoardTitle(); }catch(e){}
     // спрятать все прочие экраны
@@ -1203,12 +1202,13 @@
         greenChance=Math.min(0.82, greenChance + (S.greenDry||0)*0.12);
         var grace=(S.rumGrace||0)>0;
         var greenKillGrace=(S.greenKillCD||0)>0;
-        var rollGreen=Math.random()<greenChance && !grace && !greenKillGrace;
+        var rumOnScreen=hasRum();
+        var rollGreen=Math.random()<greenChance && !grace && !greenKillGrace && !(rumOnScreen&&gc>=3);
         if(rollGreen){
           spawn('green'); S.greenDry=0;
         } else if(sc<sourCap){
           spawn('sour'); S.greenDry=(S.greenDry||0)+1;
-        } else if(!grace && !greenKillGrace){
+        } else if(!grace && !greenKillGrace && !(rumOnScreen&&gc>=3)){
           spawn('green'); S.greenDry=0;
         }
       }
@@ -1709,29 +1709,90 @@
     lbSubmit(name,myScore,function(ok){
       if(!ok){ btn.disabled=false; btn.textContent='Ошибка — ещё раз'; return; }
       lastSubmitted=true;
-      document.getElementById('submitBox').style.display='none';
-      document.getElementById('boardRows').innerHTML='<div class="bload">обновляем…</div>';
-      lbLoad(function(arr){ renderBoard(arr,name,myScore); });
+      btn.textContent='Записано!';
+      setTimeout(function(){ document.getElementById('submitBox').style.display='none'; },800);
     });
   };
   var _shareData=null;
+  function _buildShareCanvas(data,cb){
+    var W=540,H=320,dpr=2;
+    var sc=document.createElement('canvas');
+    sc.width=W*dpr; sc.height=H*dpr;
+    var cx=sc.getContext('2d');
+    cx.scale(dpr,dpr);
+    // background
+    cx.fillStyle='#160c04'; cx.fillRect(0,0,W,H);
+    // border
+    cx.strokeStyle='#c79b42'; cx.lineWidth=3;
+    cx.strokeRect(10,10,W-20,H-20);
+    // inner glow line
+    cx.strokeStyle='rgba(199,155,66,0.25)'; cx.lineWidth=1;
+    cx.strokeRect(16,16,W-32,H-32);
+    // title
+    cx.textAlign='center';
+    cx.fillStyle='#c79b42';
+    cx.font='bold 32px Georgia,serif';
+    cx.fillText('КУНКА', W/2, 58);
+    cx.fillStyle='#8a6020';
+    cx.font='13px Georgia,serif';
+    var modeStr=data.mode==='hard'?' · ХАРДКОР':'';
+    cx.fillText('Виноградный Шторм'+modeStr, W/2, 78);
+    // divider
+    cx.strokeStyle='#c79b42'; cx.lineWidth=1;
+    cx.beginPath(); cx.moveTo(50,92); cx.lineTo(W-50,92); cx.stroke();
+    // score
+    cx.fillStyle='#ffffff';
+    cx.font='bold 72px Georgia,serif';
+    cx.fillText(String(data.score), W/2, 175);
+    cx.fillStyle='#7a5a20';
+    cx.font='14px Georgia,serif';
+    cx.fillText('ОЧКИ', W/2, 195);
+    // rank
+    cx.fillStyle='#ffd24a';
+    cx.font='bold 22px Georgia,serif';
+    cx.fillText(data.rank, W/2, 228);
+    // stats
+    cx.fillStyle='#a07840';
+    cx.font='14px Georgia,serif';
+    var stats='⚡ Уровень '+data.level+'   🍇 '+data.purple;
+    if(data.gold) stats+='   🌟 '+data.gold;
+    cx.fillText(stats, W/2, 254);
+    // divider
+    cx.strokeStyle='rgba(199,155,66,0.4)'; cx.lineWidth=1;
+    cx.beginPath(); cx.moveTo(50,270); cx.lineTo(W-50,270); cx.stroke();
+    // url
+    cx.fillStyle='#7a6030';
+    cx.font='12px monospace';
+    cx.fillText('yotsug8.github.io/Kunkka', W/2, 292);
+    sc.toBlob(cb,'image/png');
+  }
+  function _shareTextFallback(data){
+    var mode=data.mode==='hard'?' (Хардкор)':'';
+    return '🍇 Кунка: Виноградный Шторм'+mode+'\n⚓ '+data.rank+'\n📊 '+data.score+'\n⚡ Уровень '+data.level+'\n\nhttps://yotsug8.github.io/Kunkka';
+  }
   document.getElementById('shareBtn').onclick=function(){
     if(!_shareData)return;
-    var mode=_shareData.mode==='hard'?' (Хардкор)':'';
-    var text='🍇 Кунка: Виноградный Шторм'+mode+'\n'+
-      '⚓ Ранг: '+_shareData.rank+'\n'+
-      '📊 Счёт: '+_shareData.score+'\n'+
-      '⚡ Уровень '+_shareData.level+'\n'+
-      '🍇 Съедено: '+_shareData.purple+(_shareData.gold?' · 🌟 Золотых: '+_shareData.gold:'')+'\n\n'+
-      'yotsug8.github.io/Kunkka';
     var btn=this;
-    if(navigator.share){
-      navigator.share({text:text}).catch(function(){});
-    } else if(navigator.clipboard){
-      navigator.clipboard.writeText(text).then(function(){
-        btn.textContent='Скопировано!';
-        setTimeout(function(){btn.textContent='Поделиться результатом';},2200);
-      }).catch(function(){});
+    var url='https://yotsug8.github.io/Kunkka';
+    _buildShareCanvas(_shareData,function(blob){
+      if(!blob){ _clipFallback(); return; }
+      var file=new File([blob],'kunkka_result.png',{type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file],url:url,title:'Кунка: Виноградный Шторм'}).catch(function(){});
+      } else if(navigator.share){
+        navigator.share({text:_shareTextFallback(_shareData),url:url}).catch(function(){});
+      } else {
+        _clipFallback();
+      }
+    });
+    function _clipFallback(){
+      var text=_shareTextFallback(_shareData);
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(text).then(function(){
+          btn.textContent='Скопировано!';
+          setTimeout(function(){btn.textContent='Поделиться результатом';},2200);
+        }).catch(function(){});
+      }
     }
   };
   document.getElementById('again').onclick=function(){
