@@ -71,6 +71,7 @@
   #lives.danger{ display:inline-block; animation:livesPulse .35s ease-in-out infinite; }
 
 
+
   /* ---- канат-разделитель (SVG, чёткие линии) ---- */
   .rope{width:82%;max-width:330px;margin:20px auto;display:block;
     filter:drop-shadow(0 3px 5px rgba(0,0,0,.7));}
@@ -175,10 +176,10 @@
     color:#8a6c3c;opacity:.75;}
 
   /* экран «Как играть» */
-  #howto{position:fixed;inset:0;z-index:46;display:none;overflow:hidden;}
+  #howto{position:fixed;inset:0;z-index:46;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;}
   #howtoContent{position:relative;z-index:2;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;width:100%;height:100%;padding:30px 22px;}
-  .how-row{display:flex;align-items:flex-start;gap:12px;width:100%;max-width:330px;margin:8px 0;
+    align-items:center;justify-content:flex-start;width:100%;min-height:100%;padding:24px 22px;}
+  .how-row{display:flex;align-items:flex-start;gap:12px;width:100%;max-width:330px;margin:6px 0;
     background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);padding:12px 14px;}
   .how-ic{font-size:20px;line-height:1.2;flex:none;}
   .how-tx{font-family:"Cinzel",serif;font-size:14px;color:var(--parch);line-height:1.45;letter-spacing:.3px;}
