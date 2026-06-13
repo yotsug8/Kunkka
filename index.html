@@ -457,8 +457,8 @@
       </div>
 
       <button class="btn" id="again">Ещё раз</button>
-      <button class="btn-ghost" id="shareBtn" style="margin-top:10px;">Поделиться результатом</button>
       <button class="btn" id="tomenu" style="margin-top:8px;">В меню</button>
+      <button class="btn-ghost" id="shareBtn" style="margin-top:10px;">Поделиться результатом</button>
     </div>
   </div>
 
@@ -1136,7 +1136,11 @@
     document.getElementById('submitBox').style.display='flex';
     document.getElementById('submitScore').disabled=false;
     document.getElementById('submitScore').textContent='Записать рекорд';
-    document.getElementById('board').style.display='none';
+    document.getElementById('board').style.display='';
+    document.getElementById('shareBtn').style.display='';
+    document.getElementById('boardRows').innerHTML='<div class="bload">загрузка…</div>';
+    setBoardTitle();
+    lbLoad(function(arr){ renderBoard(arr,null,null); });
     over.style.display='flex';
     game.style.display='none';
   }
@@ -1149,6 +1153,7 @@
       document.getElementById('overbest').style.display='none';
       document.getElementById('submitBox').style.display='none';
       document.getElementById('again').style.display='none';
+      document.getElementById('shareBtn').style.display='none';
     }catch(e){}
     document.getElementById('board').style.display='';
     document.getElementById('boardRows').innerHTML='<div class="bload">загрузка…</div>';
@@ -1709,8 +1714,9 @@
     lbSubmit(name,myScore,function(ok){
       if(!ok){ btn.disabled=false; btn.textContent='Ошибка — ещё раз'; return; }
       lastSubmitted=true;
-      btn.textContent='Записано!';
-      setTimeout(function(){ document.getElementById('submitBox').style.display='none'; },800);
+      document.getElementById('submitBox').style.display='none';
+      document.getElementById('boardRows').innerHTML='<div class="bload">обновляем…</div>';
+      lbLoad(function(arr){ renderBoard(arr,name,myScore); });
     });
   };
   var _shareData=null;
