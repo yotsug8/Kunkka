@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#2e1608"/>
+      <stop offset="100%" stop-color="#100804"/>
+    </radialGradient>
+    <radialGradient id="gs" cx="32%" cy="28%" r="55%">
+      <stop offset="0%" stop-color="#c07ae8" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#5a2090" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="55%" r="45%">
+      <stop offset="0%" stop-color="#7a30b8" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#100804" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="96" fill="url(#glow)"/>
+  <!-- grape row 1 (top) -->
+  <circle cx="256" cy="172" r="64" fill="#7828b8"/>
+  <circle cx="256" cy="172" r="64" fill="url(#gs)"/>
+  <!-- grape row 2 -->
+  <circle cx="192" cy="264" r="64" fill="#7828b8"/>
+  <circle cx="192" cy="264" r="64" fill="url(#gs)"/>
+  <circle cx="320" cy="264" r="64" fill="#7828b8"/>
+  <circle cx="320" cy="264" r="64" fill="url(#gs)"/>
+  <!-- grape row 3 (bottom) -->
+  <circle cx="256" cy="356" r="64" fill="#7828b8"/>
+  <circle cx="256" cy="356" r="64" fill="url(#gs)"/>
+  <!-- stem -->
+  <path d="M256 108 Q268 84 292 72" stroke="#7a5518" stroke-width="11" fill="none" stroke-linecap="round"/>
+  <!-- leaf -->
+  <path d="M292 72 Q340 52 332 96 Q310 100 292 72Z" fill="#2e8a20" opacity="0.9"/>
+  <!-- gold border accent -->
+  <rect x="3" y="3" width="506" height="506" rx="94" fill="none" stroke="#c79b42" stroke-width="6" opacity="0.35"/>
+</svg>

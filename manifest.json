@@ -1,0 +1,31 @@
+{
+  "name": "Кунка: Виноградный Шторм",
+  "short_name": "Кунка",
+  "description": "Пиратская игра — ешь виноград, давай зелёный, выживай.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#160c04",
+  "theme_color": "#c79b42",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["games"],
+  "lang": "ru"
+}
