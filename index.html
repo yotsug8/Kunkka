@@ -66,6 +66,9 @@
   /* пульс счёта при начислении */
   @keyframes scorePulse{ 0%{transform:scale(1);} 35%{transform:scale(1.18);color:#fff2c8;} 100%{transform:scale(1);} }
   .score.pulse #sc{ display:inline-block; animation:scorePulse .28s ease; }
+  /* пульс счётчика зелёных при опасности */
+  @keyframes livesPulse{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.22);} }
+  #lives.danger{ display:inline-block; animation:livesPulse .35s ease-in-out infinite; }
 
   /* ---- канат-разделитель (SVG, чёткие линии) ---- */
   .rope{width:82%;max-width:330px;margin:20px auto;display:block;
@@ -78,10 +81,13 @@
     background:radial-gradient(circle at 50% 32%, rgba(212,168,67,.06), transparent 62%);}
 
   /* заголовок — золотая гравировка по дереву, строгая */
+  @keyframes titleShimmer{0%,100%{text-shadow:0 2px 0 #3a2710,0 3px 0 #2a1c0a,0 4px 4px rgba(0,0,0,.7);}
+    55%{text-shadow:0 2px 0 #3a2710,0 3px 0 #2a1c0a,0 4px 4px rgba(0,0,0,.7),0 0 48px rgba(212,168,67,.28),0 0 12px rgba(212,168,67,.18);}}
   .title{font-family:"Cinzel Decorative",serif;font-weight:900;
     font-size:clamp(44px,15vw,104px);line-height:.9;letter-spacing:2px;
     text-transform:uppercase;text-align:center;
     color:var(--gold);
+    animation:titleShimmer 3.6s ease-in-out infinite;
     text-shadow:
       0 2px 0 #3a2710,
       0 3px 0 #2a1c0a,
@@ -655,7 +661,9 @@
   function reset(){
     _ending=false;
     _smokeSprite=null;
-    document.getElementById('lives').style.color=sourMode?'#c77bf0':'#8fd14a';
+    var _lv=document.getElementById('lives');
+    _lv.style.color=sourMode?'#c77bf0':'#8fd14a';
+    _lv.classList.remove('danger');
     SESSION={purple:0,gold:0,green:0,rum:0,score:0,level:1};
     S={score:0,level:1,grapes:[],spawnT:0,spawnGap:950*dk().spawn,
        drag:null,last:0,shake:0,flash:0,wasFull:false,mouthOpen:0,face:'idle',faceT:0,running:true,floaters:[],
@@ -1193,6 +1201,10 @@
     if(!S.running)return;
     var gc=chokableCount();
     document.getElementById('gcount').textContent=gc;
+    var livesEl=document.getElementById('lives');
+    if(gc>=4){livesEl.style.color='#ff4040';livesEl.classList.add('danger');}
+    else if(gc>=3){livesEl.style.color='#ff9020';livesEl.classList.remove('danger');}
+    else{livesEl.style.color='#8fd14a';livesEl.classList.remove('danger');}
 
     if(gc<4){
       // зелёных меньше 4 — угроза ещё не набралась
@@ -1501,6 +1513,18 @@
       kg.addColorStop(1,'rgba(255,190,60,'+(0.35*ka*kpulse)+')');
       ctx.fillStyle=kg;
       ctx.fillRect(0,0,W,H);
+      // КУРАЖ-бар: золотая полоска снизу, убывает с таймером
+      var barFrac=Math.min(1,S.kurazh/6000);
+      var barW=W*barFrac;
+      ctx.save();
+      ctx.globalAlpha=0.82+0.18*kpulse;
+      var bg2=ctx.createLinearGradient(0,0,barW,0);
+      bg2.addColorStop(0,'#ffd24a');
+      bg2.addColorStop(0.7,'#e8a820');
+      bg2.addColorStop(1,'rgba(255,200,60,0.3)');
+      ctx.fillStyle=bg2;
+      ctx.fillRect(0,H-5,barW,5);
+      ctx.restore();
     }
 
     // центральный баннер (уровень)
