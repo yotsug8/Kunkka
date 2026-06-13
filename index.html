@@ -378,11 +378,13 @@
       <div class="how-row"><span class="dot" style="background:#c77bf0;"></span>
         <span class="how-tx"><b>Фиолетовый</b> — тащи Кунке в рот. <span class="how-pt">+10</span></span></div>
       <div class="how-row"><span class="dot" style="background:#ffd24a;"></span>
-        <span class="how-tx"><b>Золотой</b> — редкий, тащи в рот, быстро исчезает. <span class="how-pt">+50</span></span></div>
+        <span class="how-tx"><b>Золотой</b> — редкий, быстро исчезает. Хватай немедленно! <span class="how-pt">+50</span></span></div>
       <div class="how-row"><span class="dot" style="background:#7ec23a;"></span>
-        <span class="how-tx"><b>Зелёный</b> — кислый! Дави нажатиями. Накопишь 4 — Кунка задохнётся.</span></div>
+        <span class="how-tx"><b>Зелёный</b> — кислый! Дави пальцем (нужно 2+ тычка). Накопишь 4 — начнётся обратный отсчёт. Не успеешь убрать — Кунка задохнётся.</span></div>
       <div class="how-row"><span class="how-ic"><svg width="15" height="21" viewBox="0 0 16 22" style="vertical-align:middle;"><rect x="6" y="1" width="4" height="4" fill="#c9a567"/><rect x="5.5" y="4.5" width="5" height="2.5" fill="#b8945a"/><rect x="3" y="7" width="10" height="14" rx="2.5" fill="#a85f25"/><rect x="4.5" y="10" width="2" height="9" rx="1" fill="#d8a04a" opacity="0.5"/></svg></span>
-        <span class="how-tx"><b>Ром</b> — тащи в рот, чтобы смыть все зелёные разом.</span></div>
+        <span class="how-tx"><b>Ром</b> — тащи в рот: сносит все зелёные разом и даёт <b>КУРАЖ</b> на 6 сек — очки ×2. <span class="how-pt">+20</span></span></div>
+      <div class="how-row"><span class="how-ic" style="font-size:13px;line-height:1">⚡</span>
+        <span class="how-tx">На высоких уровнях скорость растёт, зелёный становится крепче, окно удушения сужается. <b>Хардкор</b> — с самого начала жёстче.</span></div>
       <button class="btn" id="howBack" style="margin-top:24px;">Назад</button>
     </div>
   </div>
@@ -455,7 +457,8 @@
       </div>
 
       <button class="btn" id="again">Ещё раз</button>
-      <button class="btn" id="tomenu" style="margin-top:10px;">В меню</button>
+      <button class="btn-ghost" id="shareBtn" style="margin-top:10px;">Поделиться результатом</button>
+      <button class="btn" id="tomenu" style="margin-top:8px;">В меню</button>
     </div>
   </div>
 
@@ -1122,6 +1125,7 @@
     document.getElementById('overbest').style.display='';
     document.getElementById('again').style.display='';
     document.getElementById('finsc').textContent=S.score;
+    _shareData={score:S.score,level:SESSION.level||S.level,rank:rank(S.score),purple:SESSION.purple||0,gold:SESSION.gold||0,mode:difficulty};
     // личный рекорд
     var isNew=false;
     if(S.score>best){ best=S.score; isNew=true; try{localStorage.setItem('kunkka_best',String(best));}catch(e){} }
@@ -1709,6 +1713,26 @@
       document.getElementById('boardRows').innerHTML='<div class="bload">обновляем…</div>';
       lbLoad(function(arr){ renderBoard(arr,name,myScore); });
     });
+  };
+  var _shareData=null;
+  document.getElementById('shareBtn').onclick=function(){
+    if(!_shareData)return;
+    var mode=_shareData.mode==='hard'?' (Хардкор)':'';
+    var text='🍇 Кунка: Виноградный Шторм'+mode+'\n'+
+      '⚓ Ранг: '+_shareData.rank+'\n'+
+      '📊 Счёт: '+_shareData.score+'\n'+
+      '⚡ Уровень '+_shareData.level+'\n'+
+      '🍇 Съедено: '+_shareData.purple+(_shareData.gold?' · 🌟 Золотых: '+_shareData.gold:'')+'\n\n'+
+      'yotsug8.github.io/Kunkka';
+    var btn=this;
+    if(navigator.share){
+      navigator.share({text:text}).catch(function(){});
+    } else if(navigator.clipboard){
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent='Скопировано!';
+        setTimeout(function(){btn.textContent='Поделиться результатом';},2200);
+      }).catch(function(){});
+    }
   };
   document.getElementById('again').onclick=function(){
     death=null;_deathAlive=false;over.style.display='none';
