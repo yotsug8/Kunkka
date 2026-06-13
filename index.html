@@ -743,7 +743,9 @@
   // окно до удушения (мс) — сокращается с уровнем
   function chokeWindow(){
     var base=(4200-(S.level-1)*200)*dk().choke;
-    var floor=(difficulty==='hard')?1000:1500;   // хардкор жёстче, но не мгновенно
+    var normalFloor=(difficulty==='hard')?900:1300;
+    var doom=S.level>12?Math.min(400,(S.level-12)*30):0;
+    var floor=Math.max((difficulty==='hard')?700:850, normalFloor-doom);
     return Math.max(floor, base);
   }
 
@@ -1182,13 +1184,13 @@
       // зелёных меньше 4 — угроза ещё не набралась
       S.greenFull=0;
       S.spawnT+=dt;
-      if(S.spawnT>S.spawnGap && S.grapes.length<10){
+      if(S.spawnT>S.spawnGap && S.grapes.length<8){
         S.spawnT=0;
         var sourCap=5;
         var sc=sourCount();
-        var greenChance=Math.min(0.72,0.45+S.level*0.012);
-        if(gc<=1) greenChance=Math.min(0.85,greenChance+0.2);
-        greenChance=Math.min(0.92, greenChance + (S.greenDry||0)*0.12);
+        var greenChance=Math.min(0.64,0.45+S.level*0.012);
+        if(gc<=1) greenChance=Math.min(0.78,greenChance+0.2);
+        greenChance=Math.min(0.82, greenChance + (S.greenDry||0)*0.12);
         var grace=(S.rumGrace||0)>0;
         var rollGreen=Math.random()<greenChance && !grace;
         if(rollGreen){
