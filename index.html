@@ -66,9 +66,7 @@
   /* пульс счёта при начислении */
   @keyframes scorePulse{ 0%{transform:scale(1);} 35%{transform:scale(1.18);color:#fff2c8;} 100%{transform:scale(1);} }
   .score.pulse #sc{ display:inline-block; animation:scorePulse .28s ease; }
-  /* пульс счётчика зелёных при опасности */
-  @keyframes livesPulse{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.22);} }
-  #lives.danger{ display:inline-block; animation:livesPulse .35s ease-in-out infinite; }
+
 
   /* ---- канат-разделитель (SVG, чёткие линии) ---- */
   .rope{width:82%;max-width:330px;margin:20px auto;display:block;
@@ -661,9 +659,7 @@
   function reset(){
     _ending=false;
     _smokeSprite=null;
-    var _lv=document.getElementById('lives');
-    _lv.style.color=sourMode?'#c77bf0':'#8fd14a';
-    _lv.classList.remove('danger');
+    document.getElementById('lives').style.color=sourMode?'#c77bf0':'#8fd14a';
     SESSION={purple:0,gold:0,green:0,rum:0,score:0,level:1};
     S={score:0,level:1,grapes:[],spawnT:0,spawnGap:950*dk().spawn,
        drag:null,last:0,shake:0,flash:0,wasFull:false,mouthOpen:0,face:'idle',faceT:0,running:true,floaters:[],
@@ -1201,10 +1197,6 @@
     if(!S.running)return;
     var gc=chokableCount();
     document.getElementById('gcount').textContent=gc;
-    var livesEl=document.getElementById('lives');
-    if(gc>=4){livesEl.style.color='#ff4040';livesEl.classList.add('danger');}
-    else if(gc>=3){livesEl.style.color='#ff9020';livesEl.classList.remove('danger');}
-    else{livesEl.style.color='#8fd14a';livesEl.classList.remove('danger');}
 
     if(gc<4){
       // зелёных меньше 4 — угроза ещё не набралась
