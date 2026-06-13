@@ -643,6 +643,7 @@
 
   function reset(){
     _ending=false;
+    _smokeSprite=null;
     SESSION={purple:0,gold:0,green:0,rum:0,score:0,level:1};
     S={score:0,level:1,grapes:[],spawnT:0,spawnGap:950*dk().spawn,
        drag:null,last:0,shake:0,flash:0,wasFull:false,mouthOpen:0,face:'idle',faceT:0,running:true,floaters:[],
@@ -1037,7 +1038,9 @@
     ctx.translate(dsx,dsy);
     if(img.complete){
       ctx.fillStyle='#080604'; ctx.fillRect(b.x,b.y,b.w,b.h);
+      if(sourMode)ctx.filter='hue-rotate(100deg) saturate(2)';
       ctx.drawImage(img, b.x, b.y, b.w, b.h);
+      if(sourMode)ctx.filter='none';
     }
     drawPortraitFrame(b.x,b.y,b.w,b.h);
     ctx.restore();
@@ -1049,9 +1052,15 @@
       _smokeSprite.width=_smokeSprite.height=128;
       var sc2=_smokeSprite.getContext('2d');
       var sg=sc2.createRadialGradient(64,64,4,64,64,64);
-      sg.addColorStop(0,'rgba(48,58,40,0.85)');
-      sg.addColorStop(0.5,'rgba(30,37,26,0.45)');
-      sg.addColorStop(1,'rgba(16,18,14,0)');
+      if(sourMode){
+        sg.addColorStop(0,'rgba(70,20,90,0.85)');
+        sg.addColorStop(0.5,'rgba(45,12,60,0.45)');
+        sg.addColorStop(1,'rgba(20,8,28,0)');
+      } else {
+        sg.addColorStop(0,'rgba(48,58,40,0.85)');
+        sg.addColorStop(0.5,'rgba(30,37,26,0.45)');
+        sg.addColorStop(1,'rgba(16,18,14,0)');
+      }
       sc2.fillStyle=sg; sc2.fillRect(0,0,128,128);
     }
     ctx.save();
@@ -1077,7 +1086,14 @@
 
     if(death.t>=death.dur){
       death=null; deathLast=0; _deathAlive=false;
-      showOverScreen();   // теперь открываем таблицу
+      if(sourMode){
+        sourMode=false;
+        game.style.display='none'; document.body.classList.remove('ingame');
+        refreshMenuBest();
+        menu.style.display='flex'; setTimeout(function(){ menu.style.opacity='1'; },20);
+      } else {
+        showOverScreen();
+      }
       return;
     }
     _lastDeathTs=Date.now();
