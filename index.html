@@ -39,20 +39,16 @@
   /* текстура дерева — грубые доски с выраженными стыками */
   .wood-bg{
     background:
-      radial-gradient(ellipse 80% 38% at 50% 0%, rgba(140,70,10,.22) 0%, transparent 62%),
-      repeating-linear-gradient(89deg,
-        rgba(0,0,0,.60) 0px, rgba(0,0,0,.60) 2px,
-        rgba(180,100,30,.05) 2px, rgba(180,100,30,.05) 4px,
-        transparent 4px, transparent 78px,
-        rgba(0,0,0,.28) 78px, rgba(0,0,0,.28) 80px,
-        transparent 80px, transparent 158px,
-        rgba(0,0,0,.54) 158px, rgba(0,0,0,.54) 161px),
+      radial-gradient(ellipse 70% 30% at 50% 0%, rgba(120,55,8,.15) 0%, transparent 55%),
+      repeating-linear-gradient(90deg,
+        rgba(0,0,0,.55) 0px, rgba(0,0,0,.55) 3px,
+        rgba(0,0,0,.12) 3px, rgba(0,0,0,.12) 5px,
+        transparent 5px, transparent 92px,
+        rgba(0,0,0,.55) 92px, rgba(0,0,0,.55) 95px),
       repeating-linear-gradient(0deg,
-        rgba(0,0,0,.11) 0px, rgba(0,0,0,.11) 1px,
-        transparent 1px, transparent 9px,
-        rgba(0,0,0,.06) 9px, rgba(0,0,0,.06) 10px,
-        transparent 10px, transparent 24px),
-      linear-gradient(175deg,#3e2410 0%,#231208 52%,#160c04 100%);
+        rgba(0,0,0,.16) 0px, rgba(0,0,0,.16) 2px,
+        transparent 2px, transparent 6px),
+      linear-gradient(180deg,#3a2210,#201008 60%,#160c04);
   }
 
   .vignette{position:fixed;inset:0;pointer-events:none;z-index:90;
@@ -335,32 +331,21 @@
   </div>
   <div id="menu" class="wood-bg">
     <div class="title">Кунка<span class="l2">Виноградный Шторм</span></div>
-    <svg class="rope" viewBox="0 0 320 30" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <svg class="rope" viewBox="0 0 320 26" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="rg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#f2dc9e"/>
-          <stop offset="0.28" stop-color="#c89a50"/>
-          <stop offset="0.72" stop-color="#8a621e"/>
-          <stop offset="1" stop-color="#5a3c12"/>
+          <stop offset="0" stop-color="#d8c080"/>
+          <stop offset="0.45" stop-color="#a87838"/>
+          <stop offset="1" stop-color="#5e3e14"/>
         </linearGradient>
       </defs>
-      <!-- тень снизу для объёма -->
-      <rect x="16" y="22" width="288" height="4" rx="4" fill="rgba(0,0,0,0.38)"/>
-      <!-- основной канат -->
-      <rect x="16" y="4" width="288" height="20" rx="10" fill="url(#rg)" stroke="#3a2808" stroke-width="1.4"/>
-      <!-- пряди: влево-вниз -->
-      <g stroke="#3a2808" stroke-width="1.6" stroke-linecap="round" opacity="0.70">
-        <path d="M22 4 L38 24 M46 4 L62 24 M70 4 L86 24 M94 4 L110 24 M118 4 L134 24 M142 4 L158 24 M166 4 L182 24 M190 4 L206 24 M214 4 L230 24 M238 4 L254 24 M262 4 L278 24 M286 4 L302 24"/>
+      <rect x="16" y="5" width="288" height="16" rx="8" fill="url(#rg)" stroke="#4a3410" stroke-width="1.2"/>
+      <g stroke="#4a3410" stroke-width="1.8" stroke-linecap="round" opacity="0.78">
+        <path d="M22 5 L34 21 M38 5 L50 21 M54 5 L66 21 M70 5 L82 21 M86 5 L98 21 M102 5 L114 21 M118 5 L130 21 M134 5 L146 21 M150 5 L162 21 M166 5 L178 21 M182 5 L194 21 M198 5 L210 21 M214 5 L226 21 M230 5 L242 21 M246 5 L258 21 M262 5 L274 21 M278 5 L290 21 M294 5 L302 21"/>
       </g>
-      <!-- пряди: вправо-вниз (перекрёстные) -->
-      <g stroke="#3a2808" stroke-width="1.6" stroke-linecap="round" opacity="0.45">
-        <path d="M38 4 L22 24 M62 4 L46 24 M86 4 L70 24 M110 4 L94 24 M134 4 L118 24 M158 4 L142 24 M182 4 L166 24 M206 4 L190 24 M230 4 L214 24 M254 4 L238 24 M278 4 L262 24 M302 4 L286 24"/>
-      </g>
-      <!-- блик сверху -->
-      <rect x="16" y="5.5" width="288" height="3" rx="1.5" fill="#f8e8b8" opacity="0.45"/>
-      <!-- узлы на концах -->
-      <ellipse cx="13" cy="14" rx="13" ry="13" fill="url(#rg)" stroke="#3a2808" stroke-width="1.4"/>
-      <ellipse cx="307" cy="14" rx="13" ry="13" fill="url(#rg)" stroke="#3a2808" stroke-width="1.4"/>
+      <rect x="16" y="6.5" width="288" height="2" rx="1" fill="#c8a860" opacity="0.35"/>
+      <ellipse cx="13" cy="13" rx="13" ry="12" fill="url(#rg)" stroke="#4a3410" stroke-width="1.2"/>
+      <ellipse cx="307" cy="13" rx="13" ry="12" fill="url(#rg)" stroke="#4a3410" stroke-width="1.2"/>
     </svg>
     <div class="sub">Фиолетовый — в рот. Зелёный — дави.</div>
     <div class="diff-row" id="menuDiff">
