@@ -855,7 +855,7 @@
       burst(g.x,g.y,sourMode?'#c77bf0':'#5fd83f',5);
       if(g.hits>=greenHitsNeeded()){
         burst(g.x,g.y,sourMode?'#c77bf0':'#7ee84a',10);
-        if(!sourMode){ STATS.green++; SESSION.green++; }
+        if(!sourMode){ STATS.green++; SESSION.green++; S.greenKillCD=700; }
         if(Math.random()<0.2) say('squash');
         removeGrape(g);
       }
@@ -1192,12 +1192,13 @@
         if(gc<=1) greenChance=Math.min(0.78,greenChance+0.2);
         greenChance=Math.min(0.82, greenChance + (S.greenDry||0)*0.12);
         var grace=(S.rumGrace||0)>0;
-        var rollGreen=Math.random()<greenChance && !grace;
+        var greenKillGrace=(S.greenKillCD||0)>0;
+        var rollGreen=Math.random()<greenChance && !grace && !greenKillGrace;
         if(rollGreen){
           spawn('green'); S.greenDry=0;
         } else if(sc<sourCap){
           spawn('sour'); S.greenDry=(S.greenDry||0)+1;
-        } else if(!grace){
+        } else if(!grace && !greenKillGrace){
           spawn('green'); S.greenDry=0;
         }
       }
@@ -1214,6 +1215,7 @@
       if(S.greenFull>chokeWindow()){ end(false); }
     }
     if(gc<4) S.wasFull=false;
+    if(S.greenKillCD>0) S.greenKillCD-=dt;
     if(S.rumGrace>0) S.rumGrace-=dt;   // тает передышка после рома
     if(S.kurazh>0) S.kurazh-=dt;       // тает кураж (x2 очки)
 
