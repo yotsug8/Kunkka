@@ -1714,9 +1714,8 @@
     lbSubmit(name,myScore,function(ok){
       if(!ok){ btn.disabled=false; btn.textContent='Ошибка — ещё раз'; return; }
       lastSubmitted=true;
-      document.getElementById('submitBox').style.display='none';
-      document.getElementById('boardRows').innerHTML='<div class="bload">обновляем…</div>';
-      lbLoad(function(arr){ renderBoard(arr,name,myScore); });
+      btn.textContent='Записано!';
+      setTimeout(function(){ document.getElementById('submitBox').style.display='none'; },800);
     });
   };
   var _shareData=null;
