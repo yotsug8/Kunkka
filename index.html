@@ -179,12 +179,13 @@
   /* экран «Как играть» */
   #howto{position:fixed;inset:0;z-index:46;display:none;overflow:hidden;}
   #howtoContent{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;
-    align-items:center;justify-content:flex-start;
-    overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 22px;}
-  .how-row{display:flex;align-items:flex-start;gap:12px;width:100%;max-width:330px;margin:5px 0;
-    background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);padding:10px 14px;}
+    align-items:center;justify-content:center;overflow:hidden;padding:14px 20px;}
+  #howtoContent .set-title{font-size:24px;margin-bottom:2px;}
+  #howtoContent .rope-mini{margin:4px auto 10px;}
+  .how-row{display:flex;align-items:flex-start;gap:10px;width:100%;max-width:330px;margin:4px 0;
+    background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);padding:8px 12px;}
+  .how-tx{font-family:"Cinzel",serif;font-size:13px;color:var(--parch);line-height:1.4;letter-spacing:.2px;}
   .how-ic{font-size:20px;line-height:1.2;flex:none;}
-  .how-tx{font-family:"Cinzel",serif;font-size:14px;color:var(--parch);line-height:1.45;letter-spacing:.3px;}
   .how-tx b{color:var(--gold);}
   .how-pt{color:var(--gold);font-weight:700;}
   .dot{display:inline-block;width:16px;height:16px;border-radius:50%;flex:none;
@@ -395,7 +396,7 @@
         <span class="how-tx"><b>Ром</b> — тащи в рот: сносит все зелёные разом и даёт <b>КУРАЖ</b> на 6 сек — очки ×2. <span class="how-pt">+20</span></span></div>
       <div class="how-row"><span class="how-ic" style="font-size:13px;line-height:1">⚡</span>
         <span class="how-tx">На высоких уровнях скорость растёт, зелёный становится крепче, окно удушения сужается. <b>Хардкор</b> — с самого начала жёстче.</span></div>
-      <button class="btn" id="howBack" style="margin-top:24px;">Назад</button>
+      <button class="btn" id="howBack" style="margin-top:12px;">Назад</button>
     </div>
   </div>
 
@@ -433,7 +434,7 @@
       </div>
 
       <button class="btn" id="settingsBack" style="margin-top:26px;">Назад</button>
-      <div class="credit">Создано Admiral8Dota</div>
+      <div class="credit">Создано Admiral8Dota · v1.0</div>
     </div>
   </div>
 
