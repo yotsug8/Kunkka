@@ -1186,7 +1186,7 @@
       S.spawnT+=dt;
       if(S.spawnT>S.spawnGap && S.grapes.length<8){
         S.spawnT=0;
-        var sourCap=5;
+        var sourCap=4;
         var sc=sourCount();
         var greenChance=Math.min(0.64,0.45+S.level*0.012);
         if(gc<=1) greenChance=Math.min(0.78,greenChance+0.2);
