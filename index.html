@@ -644,6 +644,7 @@
   function reset(){
     _ending=false;
     _smokeSprite=null;
+    document.getElementById('lives').style.color=sourMode?'#c77bf0':'#8fd14a';
     SESSION={purple:0,gold:0,green:0,rum:0,score:0,level:1};
     S={score:0,level:1,grapes:[],spawnT:0,spawnGap:950*dk().spawn,
        drag:null,last:0,shake:0,flash:0,wasFull:false,mouthOpen:0,face:'idle',faceT:0,running:true,floaters:[],
@@ -1088,6 +1089,7 @@
       death=null; deathLast=0; _deathAlive=false;
       if(sourMode){
         sourMode=false;
+        bgm.pause();
         game.style.display='none'; document.body.classList.remove('ingame');
         refreshMenuBest();
         menu.style.display='flex'; setTimeout(function(){ menu.style.opacity='1'; },20);
