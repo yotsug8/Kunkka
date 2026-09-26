@@ -1,0 +1,360 @@
+/* © 2026 Admiral8Dota. Все права защищены — см. LICENSE. */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+button{outline:none !important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  -webkit-tap-highlight-color:rgba(0,0,0,0) !important;-webkit-appearance:none;appearance:none;}
+button:focus,button:focus-visible{outline:none !important;}
+html,body{height:100%;width:100%;overflow:hidden;}
+body{background:#160d06;
+  font-family:var(--font-text);color:#f0d9a8;
+  touch-action:none;user-select:none;-webkit-user-select:none;
+  text-rendering:geometricPrecision;}
+
+/* морская палитра: состаренное дерево, матовая латунь */
+:root{
+  /* шрифты задаёт тема (theme.js → fonts); здесь — значения по умолчанию */
+  --font-title:"Cinzel Decorative","Cinzel",Georgia,serif;
+  --font-text:"Cinzel",Georgia,serif;
+  --egg-title:#8fcf4f; --egg-sub:#5f9a31; --egg-shade:#23400f; --egg-shade-deep:#172b09;
+  --gold:#d4a843;       /* состаренное золото (приглушённее) */
+  --gold2:#9c6f28;      /* тёмная латунь */
+  --gold-deep:#5e4313;  /* тень золота */
+  --wood1:#33200f;      /* светлая доска */
+  --wood2:#1f1208;      /* тёмная доска */
+  --wood-deep:#130a03;  /* самый тёмный */
+  --rope:#b8945a;       /* канат */
+  --parch:#e3cd9c;      /* пергамент/текст */
+}
+
+/* текстура дерева — грубые доски с выраженными стыками */
+.wood-bg{
+  background:
+    radial-gradient(ellipse 70% 30% at 50% 0%, rgba(120,55,8,.15) 0%, transparent 55%),
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.55) 0px, rgba(0,0,0,.55) 3px,
+      rgba(0,0,0,.12) 3px, rgba(0,0,0,.12) 5px,
+      transparent 5px, transparent 92px,
+      rgba(0,0,0,.55) 92px, rgba(0,0,0,.55) 95px),
+    repeating-linear-gradient(0deg,
+      rgba(0,0,0,.16) 0px, rgba(0,0,0,.16) 2px,
+      transparent 2px, transparent 6px),
+    linear-gradient(180deg,#3a2210,#201008 60%,#160c04);
+}
+
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:90;
+  background:radial-gradient(ellipse at center, transparent 62%, rgba(0,0,0,0.30) 100%);}
+
+/* плавное появление экранов — мягко для глаз */
+@keyframes screenIn{ from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:translateY(0);} }
+#howto,#hold,#settings,#over{ animation:screenIn .5s cubic-bezier(.25,.6,.3,1) both; }
+/* пульс счёта при начислении */
+@keyframes scorePulse{ 0%{transform:scale(1);} 35%{transform:scale(1.18);color:#fff2c8;} 100%{transform:scale(1);} }
+.score.pulse #sc{ display:inline-block; animation:scorePulse .28s ease; }
+
+/* ---- канат-разделитель (SVG, чёткие линии) ---- */
+.rope{width:82%;max-width:330px;margin:20px auto;display:block;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.7));}
+
+#menu{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:30px 22px;
+  transition:opacity .5s ease;}   /* успевает погаснуть до показа поля (js/game.js, 560 мс) */
+#menu::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(circle at 50% 32%, rgba(212,168,67,.06), transparent 62%);}
+
+/* заголовок — золотая гравировка по дереву, строгая */
+@keyframes titleShimmer{0%,100%{text-shadow:0 2px 0 #3a2710,0 3px 0 #2a1c0a,0 4px 4px rgba(0,0,0,.7);}
+  55%{text-shadow:0 2px 0 #3a2710,0 3px 0 #2a1c0a,0 4px 4px rgba(0,0,0,.7),0 0 48px rgba(212,168,67,.28),0 0 12px rgba(212,168,67,.18);}}
+.title{font-family:var(--font-title);font-weight:900;
+  font-size:clamp(44px,15vw,104px);line-height:.9;letter-spacing:2px;
+  text-transform:uppercase;text-align:center;
+  color:var(--gold);
+  animation:titleShimmer 3.6s ease-in-out infinite;
+  text-shadow:
+    0 2px 0 #3a2710,
+    0 3px 0 #2a1c0a,
+    0 4px 4px rgba(0,0,0,.7);}
+.title .l2{display:block;font-size:.34em;letter-spacing:3px;margin-top:10px;white-space:nowrap;
+  color:var(--gold2);
+  text-shadow:0 1px 0 #3a2710,0 2px 3px rgba(0,0,0,.6);}
+.sub{font-size:13px;color:#d8bd86;letter-spacing:1px;margin:2px 0 4px;text-align:center;padding:0 18px;
+  line-height:1.6;font-weight:600;}
+#menuBest{font-family:var(--font-text);font-size:14px;color:var(--gold);letter-spacing:1px;
+  margin:18px 0 8px;min-height:18px;font-weight:700;
+  text-shadow:0 1px 2px #000;}
+
+/* кнопка — матовая латунная табличка, строгая, чёткая тёмная рамка */
+.btn{font-family:var(--font-text);font-weight:700;letter-spacing:3px;font-size:16px;text-transform:uppercase;
+  color:#1f1206;
+  background:linear-gradient(180deg,#c79b42 0%,#a87f30 50%,#80591f 100%);
+  border:2px solid #4a3410;padding:15px 46px;cursor:pointer;margin-top:16px;border-radius:0;
+  box-shadow:
+    0 3px 0 #2e2009,
+    0 5px 8px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(240,210,150,.35);
+  text-shadow:0 1px 0 rgba(230,200,140,.4);
+  transition:transform .07s,box-shadow .07s,filter .15s;}
+.btn:hover{filter:brightness(1.08);}
+.btn:active{transform:translateY(3px);
+  box-shadow:0 1px 0 #2e2009,0 2px 4px rgba(0,0,0,.5),inset 0 1px 0 rgba(240,210,150,.25);}
+.blink{animation:glow 2.2s ease-in-out infinite;}
+.btn.loading{animation:none;filter:brightness(.75);cursor:default;}   /* «Играть», пока грузятся картинки */
+@keyframes glow{
+  0%,100%{filter:brightness(1);}
+  50%{filter:brightness(1.08);}
+}
+/* второстепенная кнопка — без латуни, тёмная с тонкой золотой рамкой */
+.btn-ghost{font-family:var(--font-text);font-weight:600;letter-spacing:2px;font-size:13px;text-transform:uppercase;
+  color:var(--gold);background:rgba(25,14,6,.55);
+  border:1.5px solid var(--gold2);padding:10px 26px;cursor:pointer;margin-top:14px;border-radius:0;
+  box-shadow:0 2px 0 #2e2009;
+  transition:transform .07s,background .15s,border-color .15s;}
+.btn-ghost:hover{background:rgba(45,28,14,.7);border-color:var(--gold);}
+.btn-ghost:active{transform:translateY(2px);box-shadow:0 0 0 #2e2009;background:rgba(45,28,14,.7);}
+.menu-grid{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px;
+  width:100%;max-width:300px;justify-content:center;}
+.menu-grid .btn-ghost{margin-top:0;flex:0 0 calc(50% - 5px);box-sizing:border-box;
+  padding:11px 4px;font-size:12px;letter-spacing:1px;}
+
+/* ---- панель настроек ---- */
+#settings{position:fixed;inset:0;z-index:45;display:none;overflow:hidden;}
+#settingsContent{position:relative;z-index:2;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;width:100%;height:100%;padding:30px 22px;}
+.set-title{font-family:var(--font-title);font-weight:900;font-size:30px;color:var(--gold);text-align:center;
+  letter-spacing:2px;text-transform:uppercase;text-shadow:0 2px 0 #3a2710,0 3px 5px rgba(0,0,0,.7);margin-bottom:6px;}
+.rope-mini{width:200px;height:4px;margin:10px auto 26px;
+  background:repeating-linear-gradient(60deg,#6e4e1d 0,#bf9a5e 3px,#6e4e1d 6px);border-radius:2px;
+  box-shadow:0 1px 2px rgba(0,0,0,.6);}
+.set-row{display:flex;align-items:center;justify-content:space-between;
+  width:100%;max-width:280px;margin:9px 0;
+  background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);padding:11px 16px;}
+.set-label{font-family:var(--font-text);font-weight:600;font-size:16px;color:var(--parch);letter-spacing:1px;}
+.toggle{font-family:var(--font-text);font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;
+  padding:7px 16px;border:2px solid #4a3410;color:#1f1206;min-width:62px;
+  background:linear-gradient(180deg,#c79b42,#80591f);}
+.toggle.off{background:rgba(40,25,12,.8);color:#8a6c3c;border-color:#3a2710;}
+/* ползунок громкости в тему */
+.vol-row{flex-direction:column;align-items:stretch;gap:10px;}
+.vol-top{display:flex;align-items:center;justify-content:space-between;}
+.vol-val{font-family:var(--font-text);font-weight:700;font-size:13px;color:var(--gold);min-width:44px;text-align:right;}
+input[type=range].vol{-webkit-appearance:none;appearance:none;width:100%;height:8px;
+  background:linear-gradient(90deg,#80591f,#c79b42);border:1.5px solid #4a3410;outline:none;cursor:pointer;}
+input[type=range].vol::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+  width:22px;height:22px;border-radius:50%;border:2px solid #3a2710;cursor:pointer;
+  background:radial-gradient(circle at 35% 30%,#f0d488,#8a6420);box-shadow:0 1px 3px rgba(0,0,0,.6);}
+input[type=range].vol::-moz-range-thumb{width:22px;height:22px;border-radius:50%;border:2px solid #3a2710;
+  background:radial-gradient(circle at 35% 30%,#f0d488,#8a6420);cursor:pointer;}
+input[type=range].vol:disabled{opacity:.4;cursor:default;}
+.diff-row{display:flex;gap:8px;width:100%;max-width:300px;justify-content:center;}
+#menuDiff{margin:14px auto 4px;max-width:260px;}
+.diff{flex:1;font-family:var(--font-text);font-weight:600;font-size:13px;cursor:pointer;
+  padding:11px 4px;border:1.5px solid var(--gold2);color:var(--gold);background:rgba(25,14,6,.55);
+  text-transform:uppercase;letter-spacing:.5px;}
+.diff.sel{background:linear-gradient(180deg,#c79b42,#80591f);color:#1f1206;border-color:#4a3410;font-weight:700;}
+
+/* подпись автора */
+.credit{margin-top:22px;font-family:var(--font-text);font-size:11px;letter-spacing:1px;
+  color:#8a6c3c;opacity:.75;}
+
+/* экран «Как играть» */
+#howto{position:fixed;inset:0;z-index:46;display:none;overflow:hidden;}
+#howtoContent{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;
+  align-items:center;overflow-x:hidden;overflow-y:auto;padding:14px 20px;}
+/* по центру, а на низком экране — прокрутка без обрезанного заголовка */
+#howtoContent>:first-child{margin-top:auto;}
+#howtoContent>:last-child{margin-bottom:auto;}
+#howtoContent .set-title{font-size:24px;margin-bottom:2px;}
+#howtoContent .rope-mini{margin:4px auto 10px;}
+.how-row{display:flex;align-items:center;gap:10px;width:100%;max-width:330px;margin:4px 0;
+  background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);padding:8px 12px;}
+.how-tx{font-family:var(--font-text);font-size:13px;color:var(--parch);line-height:1.4;letter-spacing:.2px;}
+.how-sprite{width:34px;height:34px;object-fit:contain;flex:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5));}
+.how-face{object-fit:cover;object-position:50% 22%;border:1.5px solid var(--gold2);}
+.how-tx b{color:var(--gold);}
+.how-pt{color:var(--gold);font-weight:700;}
+
+/* каюта капитана */
+#hold{position:fixed;inset:0;z-index:46;display:none;overflow:hidden;}
+#holdContent{position:relative;z-index:2;display:flex;flex-direction:column;
+  align-items:center;width:100%;height:100%;padding:24px 22px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#rankBox{width:100%;max-width:320px;text-align:center;margin-bottom:8px;}
+#rankName{font-family:var(--font-title);font-weight:900;font-size:30px;color:var(--gold);
+  letter-spacing:1px;text-shadow:0 2px 0 #3a2710,0 3px 5px rgba(0,0,0,.6);}
+#rankBarWrap{height:14px;background:rgba(15,8,3,.7);border:1.5px solid var(--gold2);
+  margin:12px 0 6px;overflow:hidden;}
+#rankBar{height:100%;width:0%;background:linear-gradient(180deg,#e8c061,#9c6f28);
+  transition:width .6s ease;}
+#rankNext{font-family:var(--font-text);font-size:12px;color:#cdae74;letter-spacing:1px;}
+.hold-sub{font-family:var(--font-text);font-size:13px;letter-spacing:3px;color:var(--gold);
+  text-transform:uppercase;margin:20px 0 12px;font-weight:700;}
+#trophyGrid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:330px;}
+.trophy{flex:0 0 calc(33.33% - 7px);box-sizing:border-box;aspect-ratio:1/1;
+  border:1.5px solid var(--gold2);background:rgba(15,8,3,.5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px;
+  text-align:center;position:relative;}
+.trophy.locked{opacity:.8;}
+.trophy.locked .tmedal{filter:grayscale(1);opacity:.6;}
+.trophy.locked .tname{color:#a8916a;}
+.trophy .tprog{font-family:var(--font-text);font-weight:700;font-size:10px;color:#cdae74;}
+.trophy .tbar{display:block;width:80%;height:4px;background:rgba(0,0,0,.55);border:1px solid #4a3410;}
+.trophy .tbar span{display:block;height:100%;background:linear-gradient(180deg,#e8c061,#9c6f28);}
+.trophy .tmedal{width:34px;height:34px;}
+.trophy .tname{font-family:var(--font-text);font-size:9.5px;line-height:1.2;color:var(--parch);letter-spacing:.3px;}
+.trophy.unlocked .tname{color:var(--gold);}
+/* судовой журнал — компактная сетка статистики */
+#logGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;max-width:330px;}
+.log-cell{display:flex;align-items:baseline;justify-content:space-between;gap:6px;
+  border:1.5px solid var(--gold2);background:rgba(15,8,3,.5);padding:6px 9px;}
+.log-cell .lk{font-family:var(--font-text);font-size:10px;color:var(--parch);letter-spacing:.3px;line-height:1.2;}
+.log-cell .lv{font-family:var(--font-text);font-weight:700;font-size:14px;color:var(--gold);}
+
+
+#pauseOverlay{position:absolute;inset:0;z-index:55;display:none;cursor:pointer;flex-direction:column;
+  align-items:center;justify-content:center;background:rgba(20,11,4,.82);}
+#quitGame{margin-top:36px;}
+#pauseOverlay>div{display:flex;flex-direction:column;align-items:center;
+  font-family:var(--font-title);
+  font-size:36px;font-weight:900;letter-spacing:6px;color:var(--gold);
+  text-transform:uppercase;text-shadow:0 2px 0 #4a3110,0 3px 6px rgba(0,0,0,.7);}
+#pauseOverlay>div span{font-family:var(--font-text);font-size:12px;letter-spacing:2px;color:#cdae74;margin-top:18px;
+  text-shadow:none;font-weight:600;}
+#game{position:fixed;inset:0;z-index:30;display:none;background:#000;}
+#cv{display:block;position:relative;width:100%;height:100%;}
+/* слои игрового поля под и над холстом: море, портрет, свечения по краям */
+#game .glayer{position:absolute;left:0;top:0;pointer-events:none;}
+#seaLayer{right:0;bottom:0;background-color:#0c0905;background-size:cover;background-position:center;background-repeat:no-repeat;}
+#portraitLayer{will-change:transform;}
+#portraitLayer canvas{display:block;}
+#game .gedge{width:100%;height:100%;opacity:0;will-change:opacity;}
+
+/* HUD — латунные таблички */
+.hud{position:fixed;top:0;left:0;right:0;z-index:50;padding:12px 14px;
+  display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;}
+.hud .plate{background:linear-gradient(180deg,rgba(45,28,14,.92),rgba(25,14,6,.92));
+  border:1.5px solid var(--gold2);border-radius:0;padding:7px 12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(232,192,97,.2);}
+.hud .plate.score-plate{flex:none;}
+.hud .plate.lives{flex:none;text-align:right;}
+.hud .score{font-family:var(--font-text);font-size:18px;font-weight:700;color:var(--gold);letter-spacing:1px;
+  text-shadow:0 1px 2px #000;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.hud .score #sc{display:inline-block;min-width:2.4em;text-align:left;font-variant-numeric:tabular-nums;}
+.hud .lvl{font-size:10px;color:#cdae74;letter-spacing:2px;margin-top:3px;text-transform:uppercase;font-weight:600;}
+.hud .lives{font-family:var(--font-text);font-size:19px;color:#8fd14a;font-weight:700;text-shadow:0 1px 2px #000;
+  font-variant-numeric:tabular-nums;white-space:nowrap;}
+.hud .lives #gcount{display:inline-block;min-width:0.7em;text-align:center;}
+/* узкие экраны (320px): табличка очков не должна заходить под кнопку паузы */
+@media (max-width:359px){
+  .hud{padding:10px 8px;}
+  .hud .plate{padding:6px 8px;}
+  .hud .score{font-size:15px;letter-spacing:0;}
+  .hud .lives{font-size:16px;}
+}
+/* кнопка паузы — жёстко по центру, не зависит от ширины соседних табличек */
+#pause{position:absolute;left:50%;top:12px;transform:translateX(-50%);
+  pointer-events:auto;font-family:var(--font-text);font-weight:700;
+  display:flex;align-items:center;justify-content:center;min-width:34px;
+  background:linear-gradient(180deg,#c79b42,#80591f);border:2px solid #4a3410;color:#1f1206;border-radius:0;
+  padding:7px 14px;font-size:15px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;
+  -webkit-appearance:none;appearance:none;touch-action:manipulation;
+  isolation:isolate;
+  box-shadow:0 3px 0 #5e3f12,inset 0 1px 1px rgba(255,255,255,.5);}
+/* все состояния выглядят одинаково — никаких системных вспышек */
+#pause:active,#pause:focus,#pause:focus-visible,#pause:focus-within,#pause:hover{
+  outline:none !important;border-color:#4a3410 !important;
+  background:linear-gradient(180deg,#c79b42,#80591f) !important;color:#1f1206 !important;
+  box-shadow:0 3px 0 #5e3f12,inset 0 1px 1px rgba(255,255,255,.5) !important;
+  transform:translateX(-50%) !important;}
+
+/* ---- экран проигрыша: пергамент в деревянной раме ---- */
+#over{position:fixed;inset:0;z-index:60;display:none;overflow:hidden;}
+#over::before{content:"";position:absolute;inset:0;background:rgba(15,8,3,.92);}
+#overContent{position:relative;z-index:2;display:flex;flex-direction:column;
+  align-items:center;width:100%;height:100%;
+  padding:22px 12px 30px;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable both-edges;}
+#overContent::-webkit-scrollbar{width:0;background:transparent;}
+#over h2{font-family:var(--font-title);font-size:26px;color:var(--gold);margin-bottom:10px;letter-spacing:1px;text-align:center;
+  text-transform:uppercase;text-shadow:0 2px 0 #4a3110,0 3px 6px rgba(0,0,0,.7);padding:0 16px;font-weight:900;}
+#over .fin{font-family:var(--font-text);font-size:18px;color:var(--parch);margin-bottom:12px;letter-spacing:1px;font-weight:600;text-shadow:0 1px 2px #000;}
+#overbest{font-size:13px;color:#cdae74;letter-spacing:1px;margin-bottom:16px;font-weight:600;}
+#overbest.isnew{color:var(--gold);font-weight:700;animation:cpop .3s ease;text-shadow:0 0 10px rgba(232,192,97,.6);}
+@keyframes cpop{from{transform:scale(1.5);}to{transform:scale(1);}}
+
+#submitBox{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:8px;}
+/* поле ника: 12 самых широких букв (Щ, Ж, W) должны влезать и на экране 320px */
+#pname{font-family:var(--font-text);font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  text-align:center;font-size:clamp(13px,4vw,15px);color:#2a1a08;
+  background:linear-gradient(180deg,#f0d9a8,#d8bd86);
+  border:2px solid var(--gold2);padding:11px 8px;width:min(270px,84vw);outline:none;border-radius:0;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.3);}
+#pname::placeholder{color:#8a6c3c;}
+#submitBox .btn{margin-top:0;font-size:14px;padding:11px 26px;}
+#submitNote{display:none;font-size:13px;color:#cdae74;letter-spacing:.5px;font-weight:600;text-align:center;padding:0 16px;margin:2px 0 4px;}
+
+/* таблица рекордов — деревянная доска с золотой рамкой */
+#board{margin:14px 0 18px;width:100%;max-width:350px;
+  background:linear-gradient(180deg,rgba(45,28,14,.6),rgba(25,14,6,.6));
+  border:2px solid var(--gold2);border-radius:0;padding:12px 8px;
+  box-shadow:0 4px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(232,192,97,.15);}
+#board .bt{font-family:var(--font-title);font-size:14px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;
+  text-align:center;margin-bottom:10px;font-weight:700;text-shadow:0 1px 2px #000;}
+/* строка таблицы: ник из 12 широких букв и шестизначный счёт в одну строку и на 320px */
+#board .br{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:6px 8px;
+  font-family:var(--font-text);font-size:clamp(12px,3.6vw,15px);color:var(--parch);font-weight:600;
+  border-bottom:1px solid rgba(183,132,47,.3);}
+#board .br:last-child{border-bottom:none;}
+#board .br .rk{flex:none;color:var(--gold2);min-width:22px;text-align:left;font-weight:700;}
+#board .br.apart{margin-top:10px;}   /* своё место ниже топ-10 — отдельно от таблицы */
+#board .br .nm{flex:1;min-width:0;text-align:left;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#board .br .sc{flex:none;font-weight:700;text-align:right;color:var(--gold);}
+#board .br.me{background:rgba(232,192,97,.12);}
+#board .br.me .rk,#board .br.me .nm{color:var(--gold);}
+#board .bload{text-align:center;color:#a8884e;font-size:13px;padding:8px;letter-spacing:1px;font-weight:600;}
+
+/* блокировка горизонтальной ориентации */
+#rotateLock{position:fixed;inset:0;z-index:200;display:none;
+  background:linear-gradient(180deg,#33200f,#160c04);
+  color:var(--gold);font-family:var(--font-text);text-align:center;
+  align-items:center;justify-content:center;flex-direction:column;padding:30px;letter-spacing:1px;}
+#rotateLock .ic{font-size:40px;margin-bottom:18px;animation:rotateHint 2s ease-in-out infinite;}
+@keyframes rotateHint{0%,100%{transform:rotate(0);}50%{transform:rotate(-90deg);}}
+@media (orientation:landscape) and (max-height:520px){
+  #rotateLock{display:flex;}
+}
+
+/* заставка пасхалки «Кислый Кунка» */
+#eggToast{display:none;position:fixed;inset:0;z-index:300;align-items:center;justify-content:center;
+  background:rgba(10,6,2,.94);}
+#eggToast .egg-box{text-align:center;padding:0 16px;}
+/* как заголовок меню, но в цветах пасхалки (цвета — из темы) */
+#eggToast .egg-title{font-family:var(--font-title);font-weight:900;text-transform:uppercase;line-height:.92;
+  font-size:clamp(44px,14vw,92px);letter-spacing:2px;color:var(--egg-title);
+  text-shadow:0 2px 0 var(--egg-shade),0 3px 0 var(--egg-shade-deep),0 4px 4px rgba(0,0,0,.7);}
+#eggToast .egg-sub{font-family:var(--font-title);font-weight:900;text-transform:uppercase;
+  font-size:clamp(16px,5vw,33px);letter-spacing:4px;margin-top:14px;color:var(--egg-sub);
+  text-shadow:0 1px 0 var(--egg-shade),0 2px 3px rgba(0,0,0,.6);}
+
+/* кнопка установки приложения — появляется, когда браузер предлагает установку */
+#installBtn{display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:none;border:none;
+  color:#7a6040;font-family:var(--font-text);font-size:10px;letter-spacing:1px;cursor:pointer;opacity:.55;padding:6px 12px;white-space:nowrap;}
+
+/* отступы кнопок «Назад» и экрана результата */
+#howBack{margin-top:12px;}
+#holdBack{margin-top:20px;}
+#settingsBack{margin-top:26px;}
+#tomenu{margin-top:8px;}
+#shareBtn{margin-top:10px;}
+
+/* уведомление о трофее */
+#trophyToast{position:fixed;top:16px;left:50%;z-index:120;
+  display:flex;align-items:center;gap:11px;
+  background:linear-gradient(180deg,rgba(45,28,14,.97),rgba(25,14,6,.97));
+  border:1.5px solid var(--gold2);padding:10px 18px;max-width:calc(100vw - 24px);
+  box-shadow:0 4px 16px rgba(0,0,0,.6);
+  transform:translateX(-50%) translateY(-140px);
+  transition:transform .5s cubic-bezier(.2,.8,.3,1);
+  will-change:transform;}
+#trophyToast.show{transform:translateX(-50%) translateY(0);}
+#trophyToast .tt-medal{width:34px;height:34px;flex:none;}
+#trophyToast .tt-title{font-family:var(--font-text);font-size:10px;letter-spacing:2px;color:#cdae74;text-transform:uppercase;white-space:nowrap;}
+#trophyToast .tt-name{font-family:var(--font-text);font-size:15px;font-weight:700;color:var(--gold);white-space:nowrap;}
