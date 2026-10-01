@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кунка: скачать</title>
+<meta name="description" content="Кунка: Виноградный Шторм для Android и iPhone">
+<meta property="og:title" content="Кунка: Виноградный Шторм">
+<meta property="og:description" content="Скачать на Android и iPhone">
+<meta property="og:image" content="https://yotsug8.github.io/Kunkka/themes/kunka/icons/icon-512.png">
+<meta name="theme-color" content="#160c04">
+<link rel="icon" href="../themes/kunka/icons/favicon.png">
+<!-- страница скачивания: собирается tools/site.js, {{…}} подставляются при сборке -->
+<style>
+@font-face{font-family:"PT Serif";font-weight:400;src:url(../themes/kunka/fonts/pt-serif-400-cyrillic.woff2) format("woff2");font-display:swap;unicode-range:U+0400-045F}
+@font-face{font-family:"PT Serif";font-weight:400;src:url(../themes/kunka/fonts/pt-serif-400-latin.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:"PT Serif";font-weight:700;src:url(../themes/kunka/fonts/pt-serif-700-cyrillic.woff2) format("woff2");font-display:swap;unicode-range:U+0400-045F}
+@font-face{font-family:"PT Serif";font-weight:700;src:url(../themes/kunka/fonts/pt-serif-700-latin.woff2) format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+2000-206F}
+:root{--gold:#d4a843;--gold2:#9c6f28;--parch:#e8d5a8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;}
+body{font-family:"PT Serif",Georgia,serif;color:var(--parch);background:#160c04;
+  background:radial-gradient(ellipse 75% 40% at 50% 18%,rgba(255,170,70,.24),transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 45%,transparent 45%,rgba(0,0,0,.85) 100%),
+    url(../themes/kunka/img/menu_wood.jpg) center/cover fixed,#2a170a;
+  display:flex;justify-content:center;padding:40px 16px 48px;}
+main{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.icon{width:112px;height:112px;border-radius:26px;box-shadow:0 8px 24px rgba(0,0,0,.6),0 0 0 2px rgba(212,168,67,.55);}
+h1{margin-top:22px;font-size:38px;font-weight:700;letter-spacing:2px;text-transform:uppercase;line-height:1;
+  background:linear-gradient(180deg,#f6dc93 0%,#d9ad55 45%,#a8792a 70%,#e2bd68 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.7));}
+.sub{margin-top:8px;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#b48636;}
+.btn{margin-top:28px;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:18px 20px;text-decoration:none;
+  font-family:inherit;font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#2a1606;
+  background:linear-gradient(180deg,#f0cf7a,#c9953b 55%,#9c6f28);border:2px solid #5e4313;
+  box-shadow:0 6px 16px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,240,200,.6),inset 0 -2px 0 rgba(0,0,0,.25);}
+.btn:active{transform:translateY(1px);}
+.btn svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.meta{margin-top:10px;font-size:12px;letter-spacing:1px;color:#a88a5a;}
+.alt{margin-top:14px;font-size:14px;}
+.alt a{color:var(--gold);}
+.card{margin-top:26px;width:100%;text-align:left;padding:18px 18px 16px;
+  background:linear-gradient(180deg,rgba(45,28,14,.92),rgba(25,14,6,.92));border:1.5px solid var(--gold2);
+  box-shadow:0 2px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(232,192,97,.2);}
+.card h2{display:flex;align-items:center;gap:10px;font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
+.card h2 svg{width:20px;height:20px;fill:currentColor;flex:none;}
+.card ol{margin:12px 0 0 20px;font-size:14px;line-height:1.55;}
+.card li+li{margin-top:6px;}
+.card b{color:#f0d690;}
+.card.hi{border-color:var(--gold);box-shadow:0 2px 12px rgba(0,0,0,.5),0 0 0 1px rgba(212,168,67,.4),inset 0 1px 0 rgba(232,192,97,.25);}
+footer{margin-top:30px;font-size:12px;color:#8a6d45;}
+</style>
+</head>
+<body>
+<main>
+  <img class="icon" src="../themes/kunka/icons/icon-512.png" alt="">
+  <h1>Кунка</h1>
+  <div class="sub">Виноградный Шторм</div>
+
+  <a class="btn" id="apk" href="../kunkka.apk" download="kunkka.apk">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m-5-5 5 5 5-5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+    Скачать для Android
+  </a>
+  <div class="meta">Версия 1.10 · 2,5 МБ</div>
+  <div class="alt"><a href="../">Играть в браузере</a></div>
+
+  <section class="card" id="android">
+    <h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9h10a1 1 0 0 1 1 1v7a2 2 0 0 1-2 2h-1v2.5a1.5 1.5 0 0 1-3 0V19h-0v2.5a1.5 1.5 0 0 1-3 0V19H8a2 2 0 0 1-2-2v-7a1 1 0 0 1 1-1Zm-3.5 0A1.5 1.5 0 0 1 5 10.5v5a1.5 1.5 0 0 1-3 0v-5A1.5 1.5 0 0 1 3.5 9Zm17 0a1.5 1.5 0 0 1 1.5 1.5v5a1.5 1.5 0 0 1-3 0v-5A1.5 1.5 0 0 1 20.5 9ZM8.2 3.3l1 1.6A6 6 0 0 1 12 4.3a6 6 0 0 1 2.8.6l1-1.6a.4.4 0 0 1 .7.4l-1 1.6A5.5 5.5 0 0 1 18 8H6a5.5 5.5 0 0 1 2.5-3.7l-1-1.6a.4.4 0 0 1 .7-.4ZM9.5 6a.7.7 0 1 0 0 1.4.7.7 0 0 0 0-1.4Zm5 0a.7.7 0 1 0 0 1.4.7.7 0 0 0 0-1.4Z"/></svg>Android</h2>
+    <ol>
+      <li>Скачай файл и открой его.</li>
+      <li>Разреши установку из этого источника.</li>
+      <li>Если появится Play Защита, нажми <b>Подробнее</b>, потом <b>Всё равно установить</b>.</li>
+    </ol>
+  </section>
+
+  <section class="card" id="ios">
+    <h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.5 2-3.6-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.8-3.5.8-.7 0-1.9-.8-3-.8C6.9 7.2 5.2 8.2 4.3 9.8c-2 3.4-.5 8.4 1.4 11.1.9 1.3 2 2.8 3.4 2.8 1.4-.1 1.9-.9 3.5-.9s2.1.9 3.5.9c1.5 0 2.4-1.3 3.3-2.7 1-1.5 1.5-3 1.5-3.1 0 0-2.5-1-2.5-4.3ZM14.1 5.4c.8-.9 1.3-2.2 1.1-3.4-1.1.1-2.4.7-3.2 1.6-.7.8-1.3 2.1-1.2 3.3 1.2.1 2.5-.6 3.3-1.5Z"/></svg>iPhone</h2>
+    <ol>
+      <li>Открой <a href="../" style="color:var(--gold)">игру</a> в Safari.</li>
+      <li>Нажми <b>Поделиться</b>.</li>
+      <li>Выбери <b>На экран Домой</b>.</li>
+    </ol>
+  </section>
+
+  <footer>© 2026 Admiral8Dota</footer>
+</main>
+<script>
+// на iPhone первой идёт инструкция для iPhone, на Android её подсвечиваем
+(function(){
+  var ua=navigator.userAgent, ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var a=document.getElementById('android'), i=document.getElementById('ios');
+  if(ios){ i.classList.add('hi'); a.parentNode.insertBefore(i,a); }
+  else if(/Android/.test(ua)) a.classList.add('hi');
+})();
+</script>
+</body>
+</html>

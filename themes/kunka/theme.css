@@ -1,0 +1,12 @@
+/* Кунка: меню на корабельной обшивке (доски без гвоздей). Картинки перечислены в theme.js (images), чтобы попасть в офлайн-кэш */
+.wood-bg{
+  background:
+    radial-gradient(ellipse 75% 45% at 50% 30%, rgba(255,170,70,.24), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 45%, transparent 45%, rgba(0,0,0,.9) 100%),
+    url(img/menu_wood.jpg) center/cover,
+    #2a170a;
+}
+.btn,.diff.sel{
+  background:linear-gradient(180deg,rgba(255,220,160,.18),transparent 40%,rgba(0,0,0,.25)),
+    url(img/button_plank.jpg) center/cover,#5a3419;
+}
