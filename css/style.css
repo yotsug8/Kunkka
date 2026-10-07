@@ -1,0 +1,489 @@
+/* © 2026 Admiral8Dota. Все права защищены — см. LICENSE. */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+button{outline:none !important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  -webkit-tap-highlight-color:rgba(0,0,0,0) !important;-webkit-appearance:none;appearance:none;}
+button:focus,button:focus-visible{outline:none !important;}
+html,body{height:100%;width:100%;overflow:hidden;}
+body{background:#160d06;
+  font-family:var(--font-text);color:#f0d9a8;
+  font-synthesis:none;   /* у шрифта темы может не быть жирного — не рисуем поддельный */
+  touch-action:none;user-select:none;-webkit-user-select:none;
+  text-rendering:geometricPrecision;}
+
+/* морская палитра: состаренное дерево, матовая латунь */
+:root{
+  /* шрифты задаёт тема (theme.js → fonts); здесь — значения по умолчанию */
+  --font-title:"Cinzel Decorative","Cinzel",Georgia,serif;
+  --font-text:"Cinzel",Georgia,serif;
+  --egg-title:#8fcf4f; --egg-sub:#5f9a31; --egg-shade:#23400f; --egg-shade-deep:#172b09;
+  --gold:#d4a843;       /* состаренное золото (приглушённее) */
+  --gold2:#9c6f28;      /* тёмная латунь */
+  --gold-deep:#5e4313;  /* тень золота */
+  --wood1:#33200f;      /* светлая доска */
+  --wood2:#1f1208;      /* тёмная доска */
+  --wood-deep:#130a03;  /* самый тёмный */
+  --parch:#e3cd9c;      /* пергамент/текст */
+}
+
+/* дерево: тёплый свет сверху, тень по краям и доски, нарисованные градиентами.
+   Тема может подложить свою картинку досок (theme.css) */
+.wood-bg{
+  background:
+    radial-gradient(ellipse 75% 45% at 50% 30%, rgba(255,170,70,.24), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 45%, transparent 45%, rgba(0,0,0,.9) 100%),
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.55) 0px, rgba(0,0,0,.55) 3px, rgba(0,0,0,.12) 3px, rgba(0,0,0,.12) 5px,
+      transparent 5px, transparent 92px, rgba(0,0,0,.55) 92px, rgba(0,0,0,.55) 95px),
+    linear-gradient(180deg,#3a2210,#201008 60%,#160c04);
+}
+
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:90;
+  background:radial-gradient(ellipse at center, transparent 62%, rgba(0,0,0,0.30) 100%);}
+
+/* плавное появление экранов — мягко для глаз */
+@keyframes screenIn{ from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:translateY(0);} }
+#howto,#hold,#settings,#over{ animation:screenIn .5s cubic-bezier(.25,.6,.3,1) both; }
+/* пульс счёта при начислении */
+@keyframes scorePulse{ 0%{transform:scale(1);} 35%{transform:scale(1.18);color:#fff2c8;} 100%{transform:scale(1);} }
+.score.pulse #sc{ display:inline-block; animation:scorePulse .28s ease; }
+
+/* ---- разделитель: сплошная канавка, прорезанная в доске ---- */
+.divider{width:78%;max-width:310px;height:14px;margin:20px auto 16px;
+  background:linear-gradient(90deg,transparent,rgba(8,4,1,.85) 8%,rgba(8,4,1,.85) 92%,transparent) center/100% 3px no-repeat;
+  filter:drop-shadow(0 1px 0 rgba(255,215,150,.18));}
+.divider-mini{width:200px;margin:8px auto 22px;}
+
+/* экран загрузки: тёмный фон и латунная полоса; меню под ним собирается целиком и не прыгает */
+#loader{position:fixed;inset:0;z-index:500;background-color:#2a170a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .3s;}
+#loader .divider{width:min(260px,70vw);margin:4px 0 10px;}
+#loader .ld-tx{font-family:var(--font-text);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#b48636;}
+#loader.done{opacity:0;pointer-events:none;}
+#loader .bar{width:min(220px,60vw);height:6px;border:1.5px solid var(--gold2);background:rgba(0,0,0,.4);padding:1px;box-sizing:content-box;}
+#loader .bar i{display:block;height:100%;width:0;background:linear-gradient(180deg,#e8c061,#9c6f28);transition:width .15s;}
+#menu{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;justify-content:safe center;padding:30px 22px;overflow-y:auto;
+  transition:opacity .5s ease;}   /* успевает погаснуть до показа поля (js/game.js, 560 мс) */
+#menu::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(circle at 50% 32%, rgba(212,168,67,.06), transparent 62%);}
+
+.title{font-family:var(--font-title);font-weight:900;
+  font-size:clamp(44px,15vw,104px);line-height:.9;letter-spacing:2px;
+  text-transform:uppercase;text-align:center;color:var(--gold);}
+/* заголовок — сусальное золото, вырезанное в доске: тёмный край сверху, светлый снизу */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .title{background:linear-gradient(180deg,#f6dc93 0%,#d9ad55 45%,#a8792a 70%,#e2bd68 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 -1px 0 rgba(0,0,0,.95)) drop-shadow(0 1px 0 rgba(255,215,150,.28)) drop-shadow(0 4px 6px rgba(0,0,0,.55));}
+  .title .l2{-webkit-text-fill-color:#b48636;}
+}
+.title .l2{display:block;font-size:.34em;letter-spacing:3px;margin-top:12px;white-space:nowrap;color:#b48636;}
+.sub{font-size:13px;color:#d9b877;letter-spacing:1px;margin:2px 0 4px;text-align:center;padding:0 18px;
+  line-height:1.6;font-weight:600;text-shadow:0 -1px 0 rgba(0,0,0,.9),0 1px 0 rgba(255,215,150,.12);}
+#menuBest{font-family:var(--font-text);font-size:14px;color:var(--gold);letter-spacing:1px;
+  margin:18px 0 8px;min-height:18px;font-weight:700;
+  text-shadow:0 1px 2px #000;}
+
+/* главная кнопка — светлая доска в тонкой золотой рамке (текстуру доски может дать тема), надпись выжжена золотом */
+.btn{font-family:var(--font-text);font-weight:700;letter-spacing:3px;font-size:17px;text-transform:uppercase;
+  position:relative;color:#f6dc93;border:none;border-radius:4px;padding:18px 60px;cursor:pointer;margin-top:16px;
+  background:linear-gradient(180deg,rgba(255,220,160,.18),transparent 40%,rgba(0,0,0,.25)),
+    linear-gradient(180deg,#6a4020,#4e2d14);
+  box-shadow:0 4px 0 #1a0d05,0 9px 16px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,215,150,.35),
+    inset 0 -2px 0 rgba(0,0,0,.35),inset 0 0 0 1px rgba(0,0,0,.5);
+  text-shadow:0 -1px 0 #000,0 1px 0 rgba(255,215,150,.25);
+  transition:transform .07s,box-shadow .07s,filter .15s;}
+.btn::before{content:"";position:absolute;inset:3px;pointer-events:none;border:1.5px solid rgba(232,192,97,.85);border-radius:2px;
+  box-shadow:0 1px 0 rgba(0,0,0,.6),inset 0 1px 0 rgba(0,0,0,.4);}
+/* «Играть» — главная кнопка: объёмный латунный обод вместо тонкой линии */
+#play::before{inset:0;border:3px solid;border-radius:0;
+  border-image:linear-gradient(180deg,#f6dc93,#7a531c 50%,#d9ad55) 1;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.6);}
+.btn:hover{filter:brightness(1.08);}
+.btn:active{transform:translateY(3px);
+  box-shadow:0 1px 0 #1a0d05,0 3px 6px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,215,150,.25),inset 0 0 0 1px rgba(0,0,0,.5);}
+.btn.loading{filter:brightness(.75);cursor:default;}   /* «Играть», пока грузятся картинки */
+/* второстепенная кнопка — ниша, вырезанная в доске, с тонкой золотой кромкой */
+.btn-ghost{font-family:var(--font-text);font-weight:600;letter-spacing:2px;font-size:13px;text-transform:uppercase;
+  color:#d9b877;background:linear-gradient(180deg,rgba(6,3,1,.7),rgba(20,11,4,.55));
+  border:none;border-radius:4px;padding:10px 26px;cursor:pointer;margin-top:14px;
+  text-shadow:0 -1px 0 #000,0 1px 0 rgba(255,215,150,.08);
+  box-shadow:inset 0 3px 6px rgba(0,0,0,.9),inset 0 0 0 1px rgba(184,138,53,.35),0 1px 0 rgba(255,215,150,.16);
+  transition:transform .07s,background .15s,color .15s;}
+.btn-ghost:hover{color:#f6dc93;}
+.btn-ghost:active{transform:translateY(1px);box-shadow:inset 0 4px 8px rgba(0,0,0,1),inset 0 0 0 1px rgba(184,138,53,.35);}
+.menu-grid{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px;
+  width:100%;max-width:300px;justify-content:center;}
+.menu-grid .btn-ghost{margin-top:0;flex:0 0 calc(50% - 5px);box-sizing:border-box;
+  padding:11px 4px;font-size:12px;letter-spacing:1px;}
+
+/* ---- панель настроек ---- */
+#settings{position:fixed;inset:0;z-index:45;display:none;overflow:hidden;}
+#settingsContent{position:relative;z-index:2;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;width:100%;height:100%;padding:30px 22px;}
+.set-title{font-family:var(--font-title);font-weight:900;font-size:30px;color:var(--gold);text-align:center;
+  letter-spacing:2px;text-transform:uppercase;text-shadow:0 2px 0 #3a2710,0 3px 5px rgba(0,0,0,.7);margin-bottom:6px;}
+.set-row{display:flex;align-items:center;justify-content:space-between;
+  width:100%;max-width:280px;margin:9px 0;
+  background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);padding:11px 16px;}
+.set-label{font-family:var(--font-text);font-weight:600;font-size:16px;color:var(--parch);letter-spacing:1px;}
+.toggle{font-family:var(--font-text);font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;
+  padding:7px 16px;border:2px solid #4a3410;color:#1f1206;min-width:62px;
+  background:linear-gradient(180deg,#c79b42,#80591f);}
+.toggle.off{background:rgba(40,25,12,.8);color:#8a6c3c;border-color:#3a2710;}
+/* ползунок громкости в тему */
+.vol-row{flex-direction:column;align-items:stretch;gap:10px;}
+.vol-top{display:flex;align-items:center;justify-content:space-between;}
+.vol-val{font-family:var(--font-text);font-weight:700;font-size:13px;color:var(--gold);min-width:44px;text-align:right;}
+/* дорожка — канавка в доске, до ручки залита золотом (--vol ставит js/game.js), ручка — латунная заклёпка */
+input[type=range].vol{-webkit-appearance:none;appearance:none;width:100%;height:10px;border:none;border-radius:5px;outline:none;cursor:pointer;
+  background:linear-gradient(90deg,#e2b862,#9c6f28) 0 0/var(--vol,70%) 100% no-repeat,
+    linear-gradient(180deg,rgba(6,3,1,.8),rgba(20,11,4,.6));
+  box-shadow:inset 0 2px 3px rgba(0,0,0,.9),inset 0 0 0 1px rgba(184,138,53,.3),0 1px 0 rgba(255,215,150,.14);}
+input[type=range].vol::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+  width:24px;height:24px;border:none;border-radius:50%;cursor:pointer;
+  background:radial-gradient(circle at 38% 32%,#f6dc93,#b8863a 55%,#6b4417);
+  box-shadow:0 2px 4px rgba(0,0,0,.7),inset 0 0 0 2px rgba(58,34,8,.6),inset 0 -2px 3px rgba(0,0,0,.35);}
+input[type=range].vol::-moz-range-thumb{width:24px;height:24px;border:none;border-radius:50%;cursor:pointer;
+  background:radial-gradient(circle at 38% 32%,#f6dc93,#b8863a 55%,#6b4417);
+  box-shadow:0 2px 4px rgba(0,0,0,.7),inset 0 0 0 2px rgba(58,34,8,.6),inset 0 -2px 3px rgba(0,0,0,.35);}
+input[type=range].vol:disabled{opacity:.4;cursor:default;}
+.diff-row{display:flex;gap:8px;width:100%;max-width:300px;justify-content:center;}
+#menuDiff{margin:14px auto 4px;max-width:260px;}
+.diff{flex:1;font-family:var(--font-text);font-weight:600;font-size:13px;cursor:pointer;
+  padding:11px 4px;border:none;border-radius:4px;color:#d9b877;
+  background:linear-gradient(180deg,rgba(6,3,1,.7),rgba(20,11,4,.55));
+  box-shadow:inset 0 3px 6px rgba(0,0,0,.9),inset 0 -1px 0 rgba(255,215,150,.14),0 1px 0 rgba(255,215,150,.16);
+  text-shadow:0 -1px 0 #000;text-transform:uppercase;letter-spacing:.5px;}
+/* выбранная — выпуклая доска над деревом (как «Играть»), невыбранная — приглушённая ниша */
+.diff:not(.sel){color:#9c7a45;}
+.diff.sel{color:#f6dc93;font-weight:700;transform:translateY(-2px);
+  background:linear-gradient(180deg,rgba(255,220,160,.18),transparent 40%,rgba(0,0,0,.25)),linear-gradient(180deg,#6a4020,#4e2d14);
+  box-shadow:0 3px 0 #1a0d05,0 5px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,215,150,.35),inset 0 0 0 1px rgba(0,0,0,.5);}
+
+/* подпись автора */
+.credit{margin-top:22px;font-family:var(--font-text);font-size:11px;letter-spacing:1px;
+  color:#8a6c3c;opacity:.75;}
+
+/* экран «Как играть» */
+#howto{position:fixed;inset:0;z-index:46;display:none;overflow:hidden;}
+#howtoContent{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;
+  align-items:center;overflow-x:hidden;overflow-y:auto;padding:14px 20px;}
+/* по центру, а на низком экране — прокрутка без обрезанного заголовка */
+#howtoContent>:first-child{margin-top:auto;}
+#howtoContent>:last-child{margin-bottom:auto;}
+#howtoContent .set-title{font-size:24px;margin-bottom:2px;}
+#howtoContent .divider-mini{margin:4px auto 10px;}
+.how-row{display:flex;align-items:center;gap:10px;width:100%;max-width:330px;margin:4px 0;
+  background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);padding:8px 12px;}
+.how-tx{font-family:var(--font-text);font-size:13px;color:var(--parch);line-height:1.4;letter-spacing:.2px;}
+.how-sprite{width:34px;height:34px;object-fit:contain;flex:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5));}
+.how-face{object-fit:cover;object-position:50% 22%;border:1.5px solid var(--gold2);}
+.how-tx b{color:var(--gold);}
+.how-pt{color:var(--gold);font-weight:700;}
+
+/* каюта капитана */
+#hold{position:fixed;inset:0;z-index:46;display:none;overflow:hidden;}
+#holdContent{position:relative;z-index:2;display:flex;flex-direction:column;
+  align-items:center;width:100%;height:100%;padding:24px 22px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#rankBox{width:100%;max-width:320px;text-align:center;margin-bottom:8px;}
+#rankName{font-family:var(--font-title);font-weight:900;font-size:30px;color:var(--gold);
+  letter-spacing:1px;text-shadow:0 2px 0 #3a2710,0 3px 5px rgba(0,0,0,.6);}
+#rankBarWrap{height:14px;background:rgba(15,8,3,.7);border:1.5px solid var(--gold2);
+  margin:12px 0 6px;overflow:hidden;}
+#rankBar{height:100%;width:0%;background:linear-gradient(180deg,#e8c061,#9c6f28);
+  transition:width .6s ease;}
+#rankNext{font-family:var(--font-text);font-size:12px;color:#cdae74;letter-spacing:1px;}
+.hold-sub{font-family:var(--font-text);font-size:13px;letter-spacing:3px;color:var(--gold);
+  text-transform:uppercase;margin:20px 0 12px;font-weight:700;}
+#trophyGrid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:330px;}
+.trophy{flex:0 0 calc(33.33% - 7px);box-sizing:border-box;aspect-ratio:1/1;
+  border:1.5px solid var(--gold2);background:rgba(15,8,3,.5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px;
+  text-align:center;position:relative;}
+.trophy.locked{opacity:.8;}
+.trophy.locked .tmedal{filter:grayscale(1);opacity:.6;}
+.trophy.locked img.tmedal{filter:none;opacity:.75;}
+.trophy.locked .tname{color:#a8916a;}
+.trophy .tprog{font-family:var(--font-text);font-weight:700;font-size:10px;color:#cdae74;}
+.trophy .tbar{display:block;width:80%;height:4px;background:rgba(0,0,0,.55);border:1px solid #4a3410;}
+.trophy .tbar span{display:block;height:100%;background:linear-gradient(180deg,#e8c061,#9c6f28);}
+.trophy .tmedal{width:34px;height:34px;}
+.trophy .tname{font-family:var(--font-text);font-size:9.5px;line-height:1.2;color:var(--parch);letter-spacing:.3px;}
+.trophy.unlocked .tname{color:var(--gold);}
+/* судовой журнал — компактная сетка статистики */
+#logGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;max-width:330px;}
+.log-cell{display:flex;align-items:baseline;justify-content:space-between;gap:6px;
+  border:1.5px solid var(--gold2);background:rgba(15,8,3,.5);padding:6px 9px;}
+.log-cell .lk{font-family:var(--font-text);font-size:10px;color:var(--parch);letter-spacing:.3px;line-height:1.2;}
+.log-cell .lv{font-family:var(--font-text);font-weight:700;font-size:14px;color:var(--gold);}
+
+
+#pauseOverlay{position:absolute;inset:0;z-index:55;display:none;cursor:pointer;flex-direction:column;
+  align-items:center;justify-content:center;background:rgba(20,11,4,.82);}
+#quitGame{margin-top:36px;}
+#pauseOverlay>div{display:flex;flex-direction:column;align-items:center;
+  font-family:var(--font-title);
+  font-size:36px;font-weight:900;letter-spacing:6px;color:var(--gold);
+  text-transform:uppercase;text-shadow:0 2px 0 #4a3110,0 3px 6px rgba(0,0,0,.7);}
+#pauseOverlay>div b{font-weight:inherit;}
+#pauseOverlay>div span{font-family:var(--font-text);font-size:12px;letter-spacing:2px;color:#cdae74;margin-top:18px;
+  text-shadow:none;font-weight:600;}
+#game{position:fixed;inset:0;z-index:30;display:none;background:#000;}
+#cv{display:block;position:relative;width:100%;height:100%;}
+/* слои игрового поля под и над холстом: море, портрет, свечения по краям */
+#game .glayer{position:absolute;left:0;top:0;pointer-events:none;}
+#seaLayer{left:-16px!important;top:-16px!important;right:-16px;bottom:-16px;background-color:#0c0905;background-size:cover;background-position:center;background-repeat:no-repeat;}
+#portraitLayer{will-change:transform;}
+#portraitLayer canvas{display:block;}
+#game .gedge{width:100%;height:100%;opacity:0;will-change:opacity;}
+
+/* HUD — латунные таблички */
+.hud{position:fixed;top:0;left:0;right:0;z-index:50;padding:12px 14px;
+  display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;}
+.hud .plate{background:linear-gradient(180deg,rgba(45,28,14,.92),rgba(25,14,6,.92));
+  border:1.5px solid var(--gold2);border-radius:0;padding:7px 12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(232,192,97,.2);}
+.hud .plate.score-plate{flex:none;}
+.hud .plate.lives{flex:none;text-align:right;}
+.hud .score{font-family:var(--font-game,var(--font-text));font-size:18px;font-weight:700;color:var(--gold);letter-spacing:1px;
+  text-shadow:0 1px 2px #000;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.hud .score #sc{display:inline-block;min-width:2.4em;text-align:left;font-variant-numeric:tabular-nums;}
+.hud .lvl{font-size:10px;color:#cdae74;letter-spacing:2px;margin-top:3px;text-transform:uppercase;font-weight:600;}
+.hud .lives{font-family:var(--font-game,var(--font-text));font-size:19px;color:#8fd14a;font-weight:700;text-shadow:0 1px 2px #000;
+  font-variant-numeric:tabular-nums;white-space:nowrap;}
+.hud .lives #gcount{display:inline-block;min-width:0.7em;text-align:center;}
+/* узкие экраны (320px): табличка очков не должна заходить под кнопку паузы */
+@media (max-width:359px){
+  .hud{padding:10px 8px;}
+  .hud .plate{padding:6px 8px;}
+  .hud .score{font-size:15px;letter-spacing:0;}
+  .hud .lives{font-size:16px;}
+}
+/* нижняя плашка: тёмные доски с золотой кромкой; высоту (--dock) задаёт игра, кнопка ульты целиком на плашке */
+#dock{position:fixed;left:0;right:0;bottom:0;height:var(--dock,76px);box-sizing:border-box;z-index:49;pointer-events:none;
+  background:
+    repeating-linear-gradient(180deg,rgba(0,0,0,.07) 0 1px,transparent 1px 5px),
+    repeating-linear-gradient(178deg,rgba(255,220,160,.05) 0 2px,transparent 2px 9px),
+    repeating-linear-gradient(0deg,transparent 0 23px,rgba(0,0,0,.35) 23px 24px),
+    linear-gradient(180deg,#8a5d2e,#5e3c1b 55%,#45290f);
+  border-top:3px solid var(--gold);
+  box-shadow:0 -3px 8px rgba(0,0,0,.5),inset 0 2px 0 var(--gold-deep);}
+#ultBtn{position:fixed;right:var(--ult-off,8.5px);bottom:var(--ult-off,8.5px);width:var(--ult-sz,60px);height:var(--ult-sz,60px);padding:0;border:none;border-radius:0;overflow:hidden;
+  pointer-events:auto;cursor:pointer;background:#081418;touch-action:none;
+  box-shadow:0 0 0 3px #45290f,0 0 0 4px rgba(0,0,0,.6),0 3px 8px rgba(0,0,0,.6);}
+/* ульта: пока копится — тёмная, светлеет снизу вверх (--ult ставит js) */
+#ultBtn img{display:block;width:100%;height:100%;filter:grayscale(.85) brightness(.55);transition:filter .3s;}
+#ultBtn span{position:absolute;left:0;right:0;bottom:0;height:var(--ult,0%);overflow:hidden;
+  background:inherit;pointer-events:none;}
+#ultBtn span::before{content:"";position:absolute;inset:auto 0 0 0;height:var(--ult-sz,60px);background:var(--ult-img) center/cover;}
+/* латунная рамка, как у табличек счёта: поверх картинки и заливки */
+#ultBtn::after{content:"";position:absolute;inset:0;border:2px solid var(--gold);pointer-events:none;
+  box-shadow:inset 0 0 0 2px var(--gold-deep),inset 0 0 0 3px rgba(0,0,0,.5),inset 0 3px 0 2px rgba(255,220,150,.15);}
+#ultBtn.ready img{filter:none;}
+#ultBtn.ready{animation:ultReady 1.6s ease-in-out infinite;}
+@keyframes ultReady{0%,100%{transform:scale(1);}50%{transform:scale(1.07);}}
+/* на отсчёте плашка темнеет вместе с полем, на паузе не видна */
+#dock,#ultBtn{transition:filter .25s,opacity .25s;}
+#game.dock-dim #dock,#game.dock-dim #ultBtn{filter:brightness(.3);pointer-events:none;}
+#game.dock-hide #dock,#game.dock-hide #ultBtn{opacity:0;pointer-events:none;}
+/* кнопка паузы — жёстко по центру, не зависит от ширины соседних табличек */
+#pause{position:absolute;left:50%;top:12px;transform:translateX(-50%);
+  pointer-events:auto;font-family:var(--font-text);font-weight:700;
+  display:flex;align-items:center;justify-content:center;min-width:34px;
+  background:linear-gradient(180deg,#c79b42,#80591f);border:2px solid #4a3410;color:#1f1206;border-radius:0;
+  padding:7px 14px;font-size:15px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;
+  -webkit-appearance:none;appearance:none;touch-action:manipulation;
+  isolation:isolate;
+  box-shadow:0 3px 0 #5e3f12,inset 0 1px 1px rgba(255,255,255,.5);}
+/* все состояния выглядят одинаково — никаких системных вспышек */
+#pause:active,#pause:focus,#pause:focus-visible,#pause:focus-within,#pause:hover{
+  outline:none !important;border-color:#4a3410 !important;
+  background:linear-gradient(180deg,#c79b42,#80591f) !important;color:#1f1206 !important;
+  box-shadow:0 3px 0 #5e3f12,inset 0 1px 1px rgba(255,255,255,.5) !important;
+  transform:translateX(-50%) !important;}
+
+/* ---- экран проигрыша и таблица рекордов: то же дерево, что в меню ---- */
+#over{position:fixed;inset:0;z-index:60;display:none;overflow:hidden;}
+#over::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 120% 90% at 50% 40%,rgba(15,8,3,.15),rgba(15,8,3,.55));}
+#overContent{position:relative;z-index:2;display:flex;flex-direction:column;
+  align-items:center;width:100%;height:100%;
+  padding:22px 12px 30px;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable both-edges;}
+#overContent::-webkit-scrollbar{width:0;background:transparent;}
+/* распорки: содержимое по центру, как в меню; длинный экран просто прокручивается */
+#overContent::before,#overContent::after{content:"";flex:1 0 0;}
+#over h2{font-family:var(--font-title);font-size:26px;color:var(--gold);margin-bottom:10px;letter-spacing:1px;text-align:center;
+  text-transform:uppercase;text-shadow:0 2px 0 #4a3110,0 3px 6px rgba(0,0,0,.7);padding:0 16px;font-weight:900;}
+/* заголовок — сусальное золото, как название в меню */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  #over h2{background:linear-gradient(180deg,#f6dc93 0%,#d9ad55 45%,#a8792a 70%,#e2bd68 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;
+    filter:drop-shadow(0 -1px 0 rgba(0,0,0,.95)) drop-shadow(0 1px 0 rgba(255,215,150,.28)) drop-shadow(0 4px 6px rgba(0,0,0,.55));}
+}
+#over .fin{font-family:var(--font-text);font-size:18px;color:var(--parch);margin-bottom:12px;letter-spacing:1px;font-weight:600;text-shadow:0 1px 2px #000;}
+#overbest{font-size:13px;color:#cdae74;letter-spacing:1px;margin-bottom:16px;font-weight:600;}
+#overbest.isnew{color:var(--gold);font-weight:700;animation:cpop .3s ease;text-shadow:0 0 10px rgba(232,192,97,.6);}
+@keyframes cpop{from{transform:scale(1.5);}to{transform:scale(1);}}
+
+#submitBox{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:8px;}
+/* поле ника: 12 самых широких букв (Щ, Ж, W) должны влезать и на экране 320px */
+#pname{font-family:var(--font-text);font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  text-align:center;font-size:clamp(13px,4vw,15px);color:#2a1a08;
+  background:linear-gradient(180deg,#f0d9a8,#d8bd86);
+  border:none;padding:11px 8px;width:min(270px,84vw);outline:none;border-radius:4px;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.45),0 0 0 1px rgba(0,0,0,.6),0 1px 0 rgba(255,215,150,.2);}
+#pname::placeholder{color:#8a6c3c;}
+#submitBox .btn{margin-top:0;font-size:14px;padding:11px 26px;}
+#submitNote{display:none;font-size:13px;color:#cdae74;letter-spacing:.5px;font-weight:600;text-align:center;padding:0 16px;margin:2px 0 4px;}
+
+/* таблица рекордов — ниша, вырезанная в доске, строки разделены канавками */
+#board{margin:14px 0 18px;width:100%;max-width:350px;
+  background:linear-gradient(180deg,rgba(6,3,1,.62),rgba(20,11,4,.48));
+  border:none;border-radius:6px;padding:14px 10px;
+  box-shadow:inset 0 3px 8px rgba(0,0,0,.85),inset 0 0 0 1px rgba(184,138,53,.25),0 1px 0 rgba(255,215,150,.14);}
+#board .bt{font-family:var(--font-title);font-size:13px;letter-spacing:3px;color:#d9b877;text-transform:uppercase;
+  text-align:center;margin-bottom:8px;padding-bottom:12px;font-weight:700;text-shadow:0 -1px 0 #000;
+  background:linear-gradient(90deg,transparent,rgba(8,4,1,.85) 10%,rgba(8,4,1,.85) 90%,transparent) bottom/100% 2px no-repeat;}
+/* строка таблицы: ник из 12 широких букв и шестизначный счёт в одну строку и на 320px */
+#board .br{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:8px 10px;
+  font-family:var(--font-text);font-size:clamp(12px,3.6vw,15px);color:var(--parch);font-weight:600;
+  text-shadow:0 -1px 0 #000;box-shadow:0 1px 0 rgba(0,0,0,.5),0 2px 0 rgba(255,215,150,.06);}
+#board .br:last-child{box-shadow:none;}
+#board .br .rk{flex:none;color:#9c7a45;min-width:22px;text-align:left;font-weight:700;}
+#board .br:nth-child(-n+3) .rk{color:var(--gold);}   /* тройка лидеров */
+#board .br.apart{margin-top:10px;}   /* своё место ниже топ-10 — отдельно от таблицы */
+#board .br .nm{flex:1;min-width:0;text-align:left;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#board .br .sc{flex:none;font-weight:700;text-align:right;color:var(--gold);}
+#board .br.me{background:rgba(232,192,97,.10);border-radius:3px;}
+#board .br.me .rk,#board .br.me .nm{color:var(--gold);}
+#board .bload{text-align:center;color:#a8884e;font-size:13px;padding:8px;letter-spacing:1px;font-weight:600;}
+
+/* блокировка горизонтальной ориентации */
+/* заставка "поверни телефон": только когда повёрнут сам телефон (класс body.rotated ставит игра);
+   узкое окно на разделённом экране под неё не попадает */
+#rotateLock{position:fixed;inset:0;z-index:200;display:none;background-color:#2a170a;
+  align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center;}
+body.rotated #rotateLock{display:flex;}
+#rotateLock .ic{width:64px;height:64px;margin-bottom:16px;fill:none;stroke:var(--gold);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));transform:rotate(90deg);animation:rotateHint 2.4s ease-in-out infinite;}
+@keyframes rotateHint{0%,20%{transform:rotate(90deg);}50%,80%{transform:rotate(0deg);}100%{transform:rotate(90deg);}}
+#rotateLock .rl-t{font-family:var(--font-title);font-weight:700;font-size:22px;line-height:1.3;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(180deg,#f6dc93 0%,#d9ad55 45%,#a8792a 70%,#e2bd68 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.7));}
+
+/* заставка пасхалки «Кислый Кунка» */
+#eggToast{display:none;position:fixed;inset:0;z-index:300;align-items:center;justify-content:center;
+  background:rgba(10,6,2,.94);}
+#eggToast .egg-box{text-align:center;padding:0 16px;}
+/* как заголовок меню, но в цветах пасхалки (цвета — из темы) */
+#eggToast .egg-title{font-family:var(--font-title);font-weight:900;text-transform:uppercase;line-height:.92;
+  font-size:clamp(44px,14vw,92px);letter-spacing:2px;color:var(--egg-title);
+  text-shadow:0 2px 0 var(--egg-shade),0 3px 0 var(--egg-shade-deep),0 4px 4px rgba(0,0,0,.7);}
+#eggToast .egg-sub{font-family:var(--font-title);font-weight:900;text-transform:uppercase;
+  font-size:clamp(16px,5vw,33px);letter-spacing:4px;margin-top:14px;color:var(--egg-sub);
+  text-shadow:0 1px 0 var(--egg-shade),0 2px 3px rgba(0,0,0,.6);}
+
+/* кнопка установки приложения — появляется, когда браузер предлагает установку */
+/* установка: веб-приложение или APK на Android — небольшая латунная табличка с иконкой внизу меню */
+#installBtn,#apkBtn{display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);white-space:nowrap;cursor:pointer;
+  align-items:center;gap:8px;padding:8px 16px 8px 12px;text-decoration:none;
+  background:linear-gradient(180deg,rgba(45,28,14,.92),rgba(25,14,6,.92));border:1.5px solid var(--gold2);
+  box-shadow:0 2px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(232,192,97,.2);
+  color:var(--gold);font-family:var(--font-text);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
+#installBtn svg,#apkBtn svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+
+/* отступы кнопок «Назад» и экрана результата */
+#howBack{margin-top:12px;}
+#holdBack{margin-top:20px;}
+#settingsBack{margin-top:26px;}
+#verLine{margin-top:14px;font-family:var(--font-text);font-size:10px;letter-spacing:1px;color:#7a6040;text-align:center;}
+#tomenu{margin-top:8px;}
+#shareBtn{margin-top:10px;}
+/* ---- онлайн-дуэль ---- */
+#showDuel{width:100%;max-width:300px;margin-top:10px;box-sizing:border-box;}
+#duelScr{position:fixed;inset:0;z-index:45;display:none;overflow:hidden;}
+#duelContent{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;height:100%;padding:30px 22px;box-sizing:border-box;}
+#duelHome,#duelLobby{display:none;flex-direction:column;align-items:center;width:100%;max-width:300px;}
+#duelScr.home #duelHome,#duelScr.lobby #duelLobby{display:flex;}
+.dinput{font-family:var(--font-text);font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:1px;text-align:center;
+  width:100%;box-sizing:border-box;padding:12px 10px;margin:10px 0;border:1.5px solid var(--gold2);color:var(--parch);outline:none;
+  background:rgba(25,14,6,.6);box-shadow:inset 0 2px 4px rgba(0,0,0,.6);border-radius:0;}
+.dinput::placeholder{color:#8a6c3c;}
+#roomCreate{margin-top:10px;}
+.room-or{margin:16px 0 0;font-family:var(--font-text);font-size:13px;color:#cdae74;letter-spacing:.5px;}
+#roomList{width:100%;display:flex;flex-direction:column;gap:6px;margin-top:8px;max-height:34vh;overflow-y:auto;}
+.rl{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;text-align:left;
+  font-family:var(--font-text);font-weight:600;font-size:15px;color:var(--parch);background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);}
+.rl:active{background:rgba(70,45,20,.6);}
+.rl small{flex:none;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#cdae74;}
+.rl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rl-empty{padding:12px;font-family:var(--font-text);font-size:13px;color:#8a6c3c;text-align:center;border:1.5px dashed rgba(184,138,53,.4);}
+.room-label{font-family:var(--font-text);font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#cdae74;margin-top:6px;}
+#roomCodeBig{font-family:var(--font-title);font-weight:900;font-size:46px;letter-spacing:10px;color:var(--gold);
+  text-shadow:0 2px 0 #3a2710,0 3px 6px rgba(0,0,0,.7);margin:2px 0 4px 10px;}
+#roomInvite{margin:4px 0 14px;}
+#roomPlayers{width:100%;display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.rp{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-family:var(--font-text);font-weight:600;
+  font-size:15px;color:var(--parch);background:rgba(25,14,6,.5);border:1.5px solid var(--gold2);}
+.rp small{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#cdae74;}
+.rp.wait{color:#8a6c3c;border-style:dashed;justify-content:center;}
+#roomDiff{margin-bottom:6px;}
+#roomDiff .diff:disabled{cursor:default;}
+#roomStart:disabled{opacity:.45;cursor:default;}
+#duelNote{min-height:18px;margin-top:10px;font-family:var(--font-text);font-size:13px;color:#e0a070;text-align:center;max-width:300px;}
+#duelBack{margin-top:8px;}
+#rematch:disabled{opacity:.6;}
+/* счёт соперника в игре — под табличкой очков */
+#oppPlate{position:absolute;left:14px;top:62px;display:none;padding:5px 10px;font-family:var(--font-text);font-weight:700;
+  font-size:13px;color:var(--parch);letter-spacing:.5px;max-width:52%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#oppPlate.on{display:block;}
+#oppPlate.done{color:#9c7a45;}
+@media (max-width:359px){ #oppPlate{left:8px;top:56px;} }
+#onlineNow{min-height:16px;margin-top:6px;font-family:var(--font-text);font-size:12px;letter-spacing:1px;color:#9c7a45;}
+.emo-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:12px 0 2px;}
+#emoOver{margin:-6px 0 14px;}
+.emo{min-width:40px;height:36px;padding:0 10px;cursor:pointer;font-family:var(--font-text);font-weight:700;font-size:14px;color:var(--parch);
+  background:rgba(25,14,6,.55);border:1.5px solid var(--gold2);border-radius:0;}
+.emo:active{background:rgba(70,45,20,.7);}
+#duelToast{position:fixed;left:50%;top:14%;z-index:80;transform:translate(-50%,-8px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  padding:10px 18px;max-width:80%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--font-text);font-weight:700;font-size:16px;color:var(--gold);
+  background:linear-gradient(180deg,rgba(45,28,14,.96),rgba(25,14,6,.96));border:1.5px solid var(--gold2);box-shadow:0 4px 12px rgba(0,0,0,.6);}
+#duelToast.on{opacity:1;transform:translate(-50%,0);}
+/* приглашения: список тех, кто в сети, в комнате и окно у приглашённого */
+#invPanel{display:none;width:100%;margin:-6px 0 14px;}
+#invList{display:flex;flex-direction:column;gap:6px;margin-top:8px;max-height:30vh;overflow-y:auto;}
+.rp.inv span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rp.inv small{margin-left:6px;}
+.rp.inv .emo:disabled{opacity:.55;cursor:default;}
+#invPop{position:fixed;left:50%;top:50%;z-index:130;transform:translate(-50%,-46%);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  width:min(320px,86vw);box-sizing:border-box;padding:20px 18px 16px;text-align:center;
+  background:linear-gradient(180deg,#2d1c0e,#190e06);border:1.5px solid var(--gold2);
+  box-shadow:0 0 0 100vmax rgba(8,4,1,.6),0 8px 24px rgba(0,0,0,.7),inset 0 1px 0 rgba(232,192,97,.2);}
+#invPop.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%);}
+#invText{font-family:var(--font-text);font-weight:700;font-size:18px;color:var(--gold);line-height:1.3;}
+#invMode{margin-top:6px;font-family:var(--font-text);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#cdae74;}
+.inv-btns{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px;}
+#duelResult{white-space:pre-line;display:none;margin:-8px 0 14px;font-size:15px;font-weight:700;letter-spacing:.5px;color:#cdae74;}
+#duelResult.win{color:var(--gold);text-shadow:0 0 10px rgba(232,192,97,.5);}
+
+/* уведомление о трофее */
+#trophyToast{position:fixed;top:16px;left:50%;z-index:120;
+  display:flex;align-items:center;gap:11px;
+  background:linear-gradient(180deg,rgba(45,28,14,.97),rgba(25,14,6,.97));
+  border:1.5px solid var(--gold2);padding:10px 18px;max-width:calc(100vw - 24px);
+  box-shadow:0 4px 16px rgba(0,0,0,.6);
+  transform:translateX(-50%) translateY(-140px);
+  transition:transform .5s cubic-bezier(.2,.8,.3,1);
+  will-change:transform;}
+#trophyToast.show{transform:translateX(-50%) translateY(0);}
+#trophyToast .tt-medal{width:34px;height:34px;flex:none;}
+#trophyToast .tt-title{font-family:var(--font-text);font-size:10px;letter-spacing:2px;color:#cdae74;text-transform:uppercase;white-space:nowrap;}
+#trophyToast .tt-name{font-family:var(--font-text);font-size:15px;font-weight:700;color:var(--gold);white-space:nowrap;}
+/* переключатель уведомлений на экране дуэли */
+#duelHome .duel-push{max-width:none;margin:14px 0 0;box-sizing:border-box;}
+#duelHome .duel-push .set-label{font-size:13px;}
+
+
